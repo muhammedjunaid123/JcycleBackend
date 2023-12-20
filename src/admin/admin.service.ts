@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { AdminRepository } from 'src/repositories/base/admin.repository';
@@ -6,13 +6,21 @@ import { UserRepository } from 'src/repositories/base/user.repository';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { UpdateProductDto } from 'src/product/dto/update-product.dto';
 import { productRepository } from 'src/repositories/base/product.repository';
+import { json } from 'stream/consumers';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 @Injectable()
 export class AdminService {
-constructor( private _adminRepository:AdminRepository,private _userRepoository:UserRepository,private _productRepository:productRepository){}
+constructor( private _adminRepository:AdminRepository,
+ 
+  private _userRepoository:UserRepository,private _productRepository:productRepository){}
 
-  SignIn(createAdminDto: CreateAdminDto) {
-  return this._adminRepository.SignIn(createAdminDto)
+  async SignIn(createAdminDto: CreateAdminDto,res:Response) {
+  return await this._adminRepository.SignIn(createAdminDto,res)
+
+  
+
   }
 
   findAll() {
@@ -45,5 +53,7 @@ constructor( private _adminRepository:AdminRepository,private _userRepoository:U
   findAlluser() {
     return this._userRepoository.findAlluser()
   }
-
+  findAllproduct(){
+    return this._productRepository.findAllProductAdmin()
+  }
 }

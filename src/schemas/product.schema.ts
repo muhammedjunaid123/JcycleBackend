@@ -12,7 +12,8 @@ export const productSchema = new mongoose.Schema(
         suspension:{type:Boolean,required:true},
         cycle_Details: { type: String, required: true },
         image:[{type:String,required:true,}],
-        isBlocked: { type: Boolean, default: false, required: true }
+        isBlocked: { type: Boolean, default: false, required: true },
+        wished:{type:Boolean,default:false,required:true}
 
 
     },

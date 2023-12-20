@@ -9,5 +9,5 @@ export class CreateProductDto {
   brake_type: boolean;
   suspension: boolean;
   cycle_Details: string;
-  image:String[]
+  image:any
 }

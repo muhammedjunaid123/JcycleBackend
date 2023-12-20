@@ -2,12 +2,42 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { productRepository } from 'src/repositories/base/product.repository';
+import { ImageService } from 'src/image/image.service';
+import { ImageController } from 'src/image/image.controller';
+import { rejects } from 'assert';
+import { resolve } from 'path';
 
 @Injectable()
 export class ProductService {
-  constructor(private _productRepository: productRepository) { }
- async createProduct(createProductDto: CreateProductDto,res:Response) {
-   return await  this._productRepository.createProduct(createProductDto,res)
+  constructor(private _productRepository: productRepository,private _jwts3:ImageService) { }
+
+ async createProduct(createProductDto: any,  files: Array<Express.Multer.File>,res:Response,) {
+     
+   const img=[]  
+const image= await files.forEach((file)=>{
+  let promise=new Promise((resolve,reject)=>{
+    
+   const data= this._jwts3.upload(file.originalname,file.buffer);
+   if(data!==null){
+     
+
+     resolve(data)
+   }
+  })
+  promise.then((res)=>{
+    
+    
+    img.push(res)
+  })
+  
+})
+console.log("img");
+ console.log(img);
+ console.log("image");
+ console.log(image);
+ 
+ 
+   return await  this._productRepository.createProduct(createProductDto,img,res)
   
 
   }
@@ -58,6 +88,17 @@ export class ProductService {
   
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+// give the bestSeller product
+  BestSeller(){
+  
+    return this._productRepository.findBestSeller()
+   
+   
+  }
+
+  filterProduct(filter:CreateProductDto){
+    return this._productRepository.filter(filter)
   }
  
 }

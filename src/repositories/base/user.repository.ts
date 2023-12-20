@@ -45,9 +45,7 @@ export class UserRepository {
       return await createdUser.save();
       
 
-    } catch (error) {
-      console.log('loging the error'+error.message);
-      
+    } catch (error) { 
       throw new HttpException(
         error,
         HttpStatus.BAD_REQUEST,
@@ -57,9 +55,10 @@ export class UserRepository {
 
   }
   // user login 
-  async SignIn(user: CreateUserDto) {
+  async SignIn(user: CreateUserDto,res:any) {
     try {
-
+            
+              
       return await this._userModel.findOne({ email: user.email })
 
     } catch (error) {
@@ -89,5 +88,7 @@ export class UserRepository {
  async userDetails(id:string){
     return await this._userModel.findById({_id:id})
   }
-  
+  async verified(id:string){
+    return await this._userModel.findByIdAndUpdate({_id:id},{$set:{isVerified:true}})
+  }
 }

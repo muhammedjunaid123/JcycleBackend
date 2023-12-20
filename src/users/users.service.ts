@@ -7,40 +7,61 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as otpGenerator from 'otp-generator';
 import { MailerService } from '@nestjs-modules/mailer';
-
+import { cartRepository } from 'src/repositories/base/cart.repository';
+import { wishlistRepository } from 'src/repositories/base/wishlist.repository';
+import { jwtDecode } from "jwt-decode";
 
 @Injectable()
 export class UsersService {
-  constructor(private UserRepository: UserRepository, private _jwtService: JwtService,private _mailerService:MailerService) {
+  constructor(private _UserRepository: UserRepository,
+    private _cartRepository: cartRepository,
+    private _jwtService: JwtService,
+    private _mailerService: MailerService,
+    private _wishlistRepository: wishlistRepository
+  ) {
 
   }
   //service for user registration
   async SignUp(createUserDto: CreateUserDto, res: Response) {
 
-     const userdata=await this.UserRepository.createUser(createUserDto)
-     return res.status(HttpStatus.CREATED).json({
+    const userdata = await this._UserRepository.createUser(createUserDto)
+    return res.status(HttpStatus.CREATED).json({
       message: 'success',
       id: userdata['_id'],
     });
 
   }
+
   //service for user login 
-  async signIn(createUserDto: CreateUserDto,res :Response) {
-    const userData = await this.UserRepository.SignIn(createUserDto);
+  async signIn(createUserDto: CreateUserDto, res: Response) {
+    const userData = await this._UserRepository.SignIn(createUserDto,res);
 
     if (userData) {
 
       const user = await bcrypt.compare(createUserDto.password, userData.password)
-
+     console.log(user);
+     
       if (user) {
+        if (user.isVerified === false) {
+          throw new HttpException(
+            'This user is not verified',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        if (user.isBlocked === true) {
+          throw new HttpException(
+            'This user block by admin',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
         const payload = { token: userData._id, role: 'user' };
-      return res.status(HttpStatus.CREATED).json({
-        access_token: await this._jwtService.sign(payload),
-        message: 'Success',
-      });
+        return res.status(HttpStatus.CREATED).json({
+          access_token: await this._jwtService.sign(payload),
+          message: 'Success',
+        });
       } else {
         throw new HttpException(
-          'email or password incorrect',
+          ' password incorrect',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -54,21 +75,12 @@ export class UsersService {
   }
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
 
-  async  sendMail(res: Response, id: string) {
+  async sendMail(res: Response, id: string) {
     try {
-      const findId = await this.UserRepository.userFindId(id);
+      const findId = await this._UserRepository.userFindId(id);
       const otp = await otpGenerator.generate(4, {
         digits: true,
         upperCaseAlphabets: false,
@@ -76,8 +88,8 @@ export class UsersService {
         specialChars: false,
       });
       console.log(otp);
-      
-      
+
+
       this._mailerService.sendMail({
         to: `${findId['email']}`,
         from: process.env.DEV_MAIL,
@@ -109,14 +121,18 @@ export class UsersService {
     </table>
     `,
       });
-      const payload = { token: findId['_id'] };
-      
-       const token=res.status(HttpStatus.CREATED).json({
+      const payload = { token: findId['_id'], role: 'user' };
+      const Token = await this._jwtService.sign(payload)
+      console.log(Token);
+
+      const token = res.status(HttpStatus.CREATED).json({
         message: 'Success',
         otp: otp,
-        access_token: await this._jwtService.sign(payload),
+        access_token: Token
       });
-      return {token}
+
+
+      return { token }
     } catch (error) {
       if (error instanceof HttpException) {
         return res.status(error.getStatus()).json({
@@ -129,7 +145,45 @@ export class UsersService {
       }
     }
   }
-  userDetails(id:string){
-    return this.UserRepository.userDetails(id)
+  verified(id: string) {
+    return this._UserRepository.verified(id)
+
+  }
+  userDetails(id: string) {
+
+    return this._UserRepository.userDetails(id)
+  }
+
+  addcart(cartdata: CreateUserDto) {
+    const { id, user } = cartdata
+
+    const decoded = jwtDecode(user);
+
+    return this._cartRepository.addCart(id, decoded['token'])
+
+
+  }
+  addwishlist(wishlistdata: CreateUserDto) {
+    const { id, user } = wishlistdata
+    const decoded = jwtDecode(user);
+    return this._wishlistRepository.addWishlist(id, decoded['token'])
+
+  }
+  wishlist(user: string) {
+    const decoded = jwtDecode(user['id']);
+    return this._wishlistRepository.Wishlist(decoded['token'])
+  }
+  cart(user: string) {
+    const decoded = jwtDecode(user['id']);
+    return this._cartRepository.cart(decoded['token'])
+  }
+  cartRemove(data: CreateUserDto) {
+    const {id,user}=data
+    console.log(user);
+    
+    const decoded = jwtDecode(user);
+    console.log(decoded);
+    
+    return this._cartRepository.cartRemove(id,decoded['token'])
   }
 }

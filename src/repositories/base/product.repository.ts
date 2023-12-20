@@ -57,9 +57,9 @@ export class productRepository {
     }
 
     // create the product 
-    async createProduct(productData: CreateProductDto,res) {
-        console.log(productData);
-         
+    async createProduct(productData: CreateProductDto,img:any,res:any) {
+      
+          
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = productData
 
         const product = new this._productModel({
@@ -72,7 +72,7 @@ export class productRepository {
             price: price,
             stock: stock,
             suspension: suspension,
-          
+            image:img
         })
         await product.save();
         return res.status(HttpStatus.CREATED).json({
@@ -128,11 +128,21 @@ export class productRepository {
         return await this._categoryModel.find()
     }
 async findAllProduct(){
-    return await this._productModel.find()
+   const data= await this._productModel.find({isBlocked:false}).populate('brand')
+   const result=data.filter((res)=>{
+    res=res['brand']
+    if( res['isBlocked']===false){
+        return res
+    }
+   })
+   return result
 }
 async findProductDetails(id:string){
     
     return await this._productModel.findById({_id:id})
+}  
+async findAllProductAdmin(){
+    return await this._productModel.find().populate('brand')
 }
 
 async brandDetails(id:string){
@@ -160,5 +170,19 @@ async productBlock_and_unblock(id:string,productData:UpdateProductDto){
   }
   async categoryDetails(id:string){
     return await this._categoryModel.findById({_id:id})
+}
+
+async findBestSeller(){
+    return await this._productModel.find().populate('brand') .limit(12)
+}
+async filter(filter:CreateProductDto){
+    const{brake_type,brand,category,suspension}=filter
+       
+
+
+    const data= await this._productModel.find({brake_type:brake_type,brand:brand,category:category,suspension:suspension}).populate('brand')
+    console.log(data);
+    
+    return data
 }
 }

@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { query } from 'express';
+import { Response, query } from 'express';
 import { UpdateProductDto } from 'src/product/dto/update-product.dto';
 
 @Controller('admin')
@@ -11,13 +11,17 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 //for admin signin 
   @Post('SignIn')
-  SignIn(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.SignIn(createAdminDto);
+  SignIn(@Body() createAdminDto: CreateAdminDto,@Res() res:Response) {
+    return this.adminService.SignIn(createAdminDto,res);
   }
 // for get the all users
   @Get('users')
   findAll() {
     return this.adminService.findAlluser();
+  }
+  @Get('product')
+  findAllproduct() {
+    return this.adminService.findAllproduct();
   }
 // 
   @Get(':id')
