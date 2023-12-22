@@ -34,13 +34,13 @@ export class UsersService {
 
   //service for user login 
   async signIn(createUserDto: CreateUserDto, res: Response) {
-    const userData = await this._UserRepository.SignIn(createUserDto,res);
+    const userData = await this._UserRepository.SignIn(createUserDto, res);
 
     if (userData) {
 
       const user = await bcrypt.compare(createUserDto.password, userData.password)
-     console.log(user);
-     
+      console.log(user);
+
       if (user) {
         if (user.isVerified === false) {
           throw new HttpException(
@@ -155,11 +155,11 @@ export class UsersService {
   }
 
   addcart(cartdata: CreateUserDto) {
-    const { id, user } = cartdata
+    const { id, user, price } = cartdata
 
     const decoded = jwtDecode(user);
 
-    return this._cartRepository.addCart(id, decoded['token'])
+    return this._cartRepository.addCart(id, decoded['token'], price)
 
 
   }
@@ -178,12 +178,14 @@ export class UsersService {
     return this._cartRepository.cart(decoded['token'])
   }
   cartRemove(data: CreateUserDto) {
-    const {id,user}=data
-    console.log(user);
-    
+    const { id, user,price,count } = data
     const decoded = jwtDecode(user);
-    console.log(decoded);
-    
-    return this._cartRepository.cartRemove(id,decoded['token'])
+    return this._cartRepository.cartRemove(id, decoded['token'],price,count)
+  }
+  cartUpdate(data: CreateUserDto) {
+    const { id, count, user, price } = data
+    const decoded = jwtDecode(user);
+
+    return this._cartRepository.cartUpdate(decoded['token'], id, count, price)
   }
 }

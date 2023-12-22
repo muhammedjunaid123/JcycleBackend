@@ -19,13 +19,7 @@ export class ProductController {
     @Res() res: Response,
     @Body() product: any,
     @UploadedFiles() files: Array<Express.Multer.File>,) {
-
-
     files = files['image']
-
-
-
-
     return this.productService.createProduct(product, files, res);
   }
   //to get all brand

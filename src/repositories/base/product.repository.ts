@@ -16,7 +16,12 @@ export class productRepository {
     //for create brand 
     async createBrand(brandName: CreateProductDto){
         const { name } = brandName;
-
+        if(name.trim()===''){
+            throw new HttpException (
+                'enter value!!!!',
+                HttpStatus.NOT_ACCEPTABLE
+              ) 
+        }
         // Check if the brand with the given name already exists
         const existingBrand = await this._brandModel.findOne({ Brand_name: name });
 
@@ -24,7 +29,7 @@ export class productRepository {
             throw new HttpException(
                 `Brand with name '${name}' already exists.`,
                 HttpStatus.BAD_REQUEST,
-              );
+              );    
          
         }
 
@@ -39,7 +44,12 @@ export class productRepository {
     // create category 
     async createCategory(categoryName: CreateProductDto) {
         const { name } = categoryName
-
+        if(name.trim()===''){
+            throw new HttpException (
+                'enter value!!!!',
+                HttpStatus.NOT_ACCEPTABLE
+              ) 
+        }
         const existingBrand = await this._categoryModel.findOne({ category_name: name });
 
         if (existingBrand) {
@@ -58,8 +68,10 @@ export class productRepository {
 
     // create the product 
     async createProduct(productData: CreateProductDto,img:any,res:any) {
-      
-          
+      const image=[]
+             for(let f of img){
+           image.push(f.secure_url)
+             }
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = productData
 
         const product = new this._productModel({
@@ -72,7 +84,7 @@ export class productRepository {
             price: price,
             stock: stock,
             suspension: suspension,
-            image:img
+            image:image
         })
         await product.save();
         return res.status(HttpStatus.CREATED).json({
@@ -83,7 +95,7 @@ export class productRepository {
     //update the product 
     async productUpdate(id: string, UpdateProduct: UpdateProductDto) {
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
-        console.log(id);
+        
         
         return await this._productModel.findByIdAndUpdate({ _id: id }, {
             $set: {
@@ -103,6 +115,12 @@ export class productRepository {
     //update the brand
     async brandUpdate(id: string, UpdateBrand: UpdateProductDto) {
         const { name } = UpdateBrand
+        if(name.trim()===''){
+            throw new HttpException (
+                'enter value!!!!',
+                HttpStatus.NOT_ACCEPTABLE
+              ) 
+        }
         return await this._brandModel.findByIdAndUpdate({ _id: id }, {
             $set: {
                 Brand_name: name
@@ -112,6 +130,12 @@ export class productRepository {
 
     async categoryUpdate(id: string, Updatecategory: UpdateProductDto) {
         const { name } = Updatecategory
+        if(name.trim()===''){
+            throw new HttpException (
+                'enter value!!!!',
+                HttpStatus.NOT_ACCEPTABLE
+              ) 
+        }
         return await this._categoryModel.findByIdAndUpdate({ _id: id }, {
             $set: {
                 category_name: name
@@ -138,8 +162,7 @@ async findAllProduct(){
    return result
 }
 async findProductDetails(id:string){
-    
-    return await this._productModel.findById({_id:id})
+ return await this._productModel.findById({_id:id}).populate('brand').populate('category')
 }  
 async findAllProductAdmin(){
     return await this._productModel.find().populate('brand')

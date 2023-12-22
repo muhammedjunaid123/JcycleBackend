@@ -19,7 +19,8 @@ export class cartRepository {
     }
     }
 
-   async  addCart(id:string,user:string){
+   async  addCart(id:string,user:string,price:number){
+    
        
         const exist= await this._cartModel.findOne({user:user})
         if(exist){
@@ -30,7 +31,7 @@ export class cartRepository {
                 HttpStatus.FOUND
               )
              }else{
-            return   await this._cartModel.findOneAndUpdate({ user: user }, { $push: { product: { id: id, count:1 } } })
+            return   await this._cartModel.findOneAndUpdate({ user: user }, { $push: { product: { id: id, count:1 } },$inc:{TotalAmount:price}})
              }
         }else{
 
@@ -40,7 +41,8 @@ export class cartRepository {
         product:[
        {
         id:id,
-        count:1
+        count:1,
+        TotalAmount:price
        }
 
         ]
@@ -48,11 +50,18 @@ export class cartRepository {
       return await data.save()
         }
     }
-   async cartRemove(id:string,user:string){
+   async cartRemove(id:string,user:string,price:number,count:number){
     const exist= await this._cartModel.findOne({user:user})
     if(exist){
-     return   await this._cartModel.findOneAndUpdate({ user: user }, { $pull: { product: { id: id} } })
+     return   await this._cartModel.findOneAndUpdate({ user: user }, { $pull: { product: { id: id} },$inc:{TotalAmount:-price*count} })
       
     }
+    }
+
+    async cartUpdate(user:string,id:string,count:number,price:number){
+  
+      console.log(price);
+      
+     return await this._cartModel.findOneAndUpdate({user:user,'product.id':id},{ $set: { 'product.$.count': count },$inc:{TotalAmount:price} })
     }
 }

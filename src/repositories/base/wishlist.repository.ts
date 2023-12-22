@@ -14,6 +14,7 @@ export class wishlistRepository {
   ) { }
 
   async addWishlist(id: string, user: string) {
+    
     const exist = await this._wishlistModel.findOne({ user: user })
     if (exist) {
      const existProduct=await this._wishlistModel.findOne({ user: user,'product.id': id })

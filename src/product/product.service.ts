@@ -9,35 +9,17 @@ import { resolve } from 'path';
 
 @Injectable()
 export class ProductService {
-  constructor(private _productRepository: productRepository,private _jwts3:ImageService) { }
+  constructor(private _productRepository: productRepository,private _image:ImageService) { }
 
  async createProduct(createProductDto: any,  files: Array<Express.Multer.File>,res:Response,) {
      
-   const img=[]  
-const image= await files.forEach((file)=>{
-  let promise=new Promise((resolve,reject)=>{
-    
-   const data= this._jwts3.upload(file.originalname,file.buffer);
-   if(data!==null){
-     
-
-     resolve(data)
-   }
-  })
-  promise.then((res)=>{
-    
-    
-    img.push(res)
-  })
   
-})
-console.log("img");
- console.log(img);
- console.log("image");
- console.log(image);
+const image= await this._image.upload(files);
+
+
  
  
-   return await  this._productRepository.createProduct(createProductDto,img,res)
+   return await  this._productRepository.createProduct(createProductDto,image,res)
   
 
   }

@@ -61,5 +61,12 @@ export class UsersController {
   cartRemove(@Body() data:CreateUserDto) {
     return this.usersService.cartRemove(data)
   }
+  @Patch('cartUpdate')
+  cartUpdate(@Body() data:CreateUserDto) {
+     console.log(data);
+     
+    
+    return this.usersService.cartUpdate(data)
+  }
 
 }

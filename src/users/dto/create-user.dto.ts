@@ -38,4 +38,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   count: number;
 
+  
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+
 }

@@ -10,6 +10,6 @@ export class ImageController {
      @UseInterceptors(FileInterceptor('file'))
    async uploadImage(@UploadedFiles() file:Express.Multer.File){
        
-        await this._image.upload(file.originalname,file.buffer)
+      
     }
 }
