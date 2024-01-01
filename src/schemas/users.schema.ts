@@ -8,6 +8,23 @@ export const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     isBlocked: { type: Boolean, default: false, required: true },
     isVerified: { type: Boolean, default: false, required: true },   
+    wallet : {
+      type : Number,
+      default : 0
+  },
+  walletHistory: [
+      {
+        date: {
+          type: Date,
+        },
+        amount: {
+          type: Number,
+        },
+        description: {
+          type: String,
+        },
+      },
+    ],
    
   },
   { timestamps: true },

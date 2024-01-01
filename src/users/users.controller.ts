@@ -87,4 +87,8 @@ export class UsersController {
   return this.usersService.orderStatusUpdate(data)
   
   }
+  @Get('wallet')
+  loadWallet(@Query() id:string ){
+return this.usersService.loadWallet(id)
+  }
 }

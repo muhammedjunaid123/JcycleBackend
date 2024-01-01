@@ -91,4 +91,8 @@ export class UserRepository {
   async verified(id:string){
     return await this._userModel.findByIdAndUpdate({_id:id},{$set:{isVerified:true}})
   }
+
+  async loadWallet(id:string){
+    return await this._userModel.findById({_id:id})
+  }
 }

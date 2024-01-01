@@ -201,7 +201,11 @@ export class UsersService {
   }
 
   orderStatusUpdate(data:any){
-    const{user,orderID,value}=data
-    return this._orderRepository.orderStatusUpdate(user['_id'],orderID,value)
+    const{user,orderID,value,Total}=data
+    return this._orderRepository.orderStatusUpdate(user['_id'],orderID,value,Total)
+  }
+  loadWallet(id:string){
+    const decoded = jwtDecode(id['id']);
+    return this._UserRepository.loadWallet(decoded['token'])
   }
 }
