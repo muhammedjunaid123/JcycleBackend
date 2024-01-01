@@ -69,4 +69,22 @@ export class UsersController {
     return this.usersService.cartUpdate(data)
   }
 
+  @Post('cheakout')
+  addOrder(@Body() data:any){
+ 
+     return this.usersService.addOrder(data)
+  } 
+  @Get('order')
+  loadOrder(@Query() id:string){
+    console.log(id);
+    
+      return this.usersService.loadOrder(id)
+  }
+
+  @Patch('orderStatus')
+  orderStatusUpdate(@Body() data:any){
+ 
+  return this.usersService.orderStatusUpdate(data)
+  
+  }
 }

@@ -2,6 +2,7 @@ import { Connection } from 'mongoose';
 import { UserSchema } from '../schemas/users.schema';
 import { cartSchema } from 'src/schemas/cart.schema';
 import { wishlistSchema } from 'src/schemas/wishlist.schema';
+import { orderSchema } from 'src/schemas/order.schema';
 
 
 export const usersProviders = [
@@ -30,6 +31,16 @@ export const wishlistProviders=[
     provide: 'WISHLIST_MODEL',
     useFactory: (connection: Connection) =>
       connection.model('wishlist', wishlistSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+]
+
+
+export const orderProviders=[
+  {
+    provide: 'ORDER_MODEL',
+    useFactory: (connection: Connection) =>
+      connection.model('order', orderSchema),
     inject: ['DATABASE_CONNECTION'],
   },
 ]

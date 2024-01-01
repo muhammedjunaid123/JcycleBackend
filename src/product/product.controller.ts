@@ -6,6 +6,8 @@ import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express
 import { S3Client } from "@aws-sdk/client-s3";
 import * as multerS3 from 'multer-s3'
 import { query } from 'express';
+import { get } from 'http';
+import { log } from 'console';
 
 @Controller('product')
 export class ProductController {
@@ -67,8 +69,6 @@ export class ProductController {
   // this will update the product 
   @Patch('id')
   productUpdate(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-
-    
     return this.productService.productUpdate(id, updateProductDto);
   }
   // this will update the brand
@@ -93,11 +93,19 @@ export class ProductController {
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
-@Post('filter')
-filter(@Body() filter:CreateProductDto){
- console.log(filter);
- return this.productService.filterProduct(filter)
- 
-}
+  @Get('filter')
+  filter(@Query() filter: CreateProductDto) {
+    console.log(filter, 'this from filter get option');  
+    console.log(filter.brand);
+    if( Boolean(filter.brake_type)!=true||false){
+      console.log('error');
+      
+    }
+    console.log(filter.brake_type);
+    console.log(filter.suspension);
+    
+    // return this.productService.filterProduct(filter)
+
+  }
 
 }

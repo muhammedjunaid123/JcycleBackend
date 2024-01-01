@@ -10,6 +10,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { cartRepository } from 'src/repositories/base/cart.repository';
 import { wishlistRepository } from 'src/repositories/base/wishlist.repository';
 import { jwtDecode } from "jwt-decode";
+import { orderRepository } from 'src/repositories/base/order.repository';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,8 @@ export class UsersService {
     private _cartRepository: cartRepository,
     private _jwtService: JwtService,
     private _mailerService: MailerService,
-    private _wishlistRepository: wishlistRepository
+    private _wishlistRepository: wishlistRepository,
+    private _orderRepository:orderRepository
   ) {
 
   }
@@ -187,5 +189,19 @@ export class UsersService {
     const decoded = jwtDecode(user);
 
     return this._cartRepository.cartUpdate(decoded['token'], id, count, price)
+  }
+  addOrder(data:any){
+    const {  user,razorId,paymentMethod } = data
+    const decoded = jwtDecode(user);
+    return this._orderRepository.addOrder(decoded['token'],razorId,paymentMethod)
+  }
+  loadOrder(id:string){
+    const decoded = jwtDecode(id['id']);
+    return this._orderRepository.loadOrder(decoded['token'])
+  }
+
+  orderStatusUpdate(data:any){
+    const{user,orderID,value}=data
+    return this._orderRepository.orderStatusUpdate(user['_id'],orderID,value)
   }
 }
