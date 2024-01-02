@@ -11,6 +11,7 @@ import { cartRepository } from 'src/repositories/base/cart.repository';
 import { wishlistRepository } from 'src/repositories/base/wishlist.repository';
 import { jwtDecode } from "jwt-decode";
 import { orderRepository } from 'src/repositories/base/order.repository';
+import { reviewRepository } from 'src/repositories/base/review.repository';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +20,8 @@ export class UsersService {
     private _jwtService: JwtService,
     private _mailerService: MailerService,
     private _wishlistRepository: wishlistRepository,
-    private _orderRepository:orderRepository
+    private _orderRepository:orderRepository,
+    private _reviewRepository:reviewRepository
   ) {
 
   }
@@ -207,5 +209,13 @@ export class UsersService {
   loadWallet(id:string){
     const decoded = jwtDecode(id['id']);
     return this._UserRepository.loadWallet(decoded['token'])
+  }
+  addReview(data:any){
+   const{user,review,ratings,productID} = data
+   const decoded = jwtDecode(user);
+   return this._reviewRepository.addReview(decoded['token'],review,ratings,productID)
+  }
+  Review(id:string){
+     return this._reviewRepository.Review(id)
   }
 }

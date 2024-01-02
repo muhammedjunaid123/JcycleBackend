@@ -6,6 +6,9 @@ import { DatabaseModule } from 'src/config/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { productRepository } from 'src/repositories/base/product.repository';
 import { ImageService } from 'src/image/image.service';
+import { reviewProviders, usersProviders } from 'src/users/users.providers';
+import { reviewRepository } from 'src/repositories/base/review.repository';
+
 
 @Module({
   imports:[ 
@@ -13,6 +16,6 @@ import { ImageService } from 'src/image/image.service';
     ConfigModule,
   ] ,
   controllers: [ProductController],
-  providers: [ProductService,...productProviders,...brandProviders,...categoryProviders,productRepository,ImageService],
+  providers: [ProductService,...productProviders,...brandProviders,...categoryProviders,productRepository,ImageService,...reviewProviders,reviewRepository],
 })
 export class ProductModule {}

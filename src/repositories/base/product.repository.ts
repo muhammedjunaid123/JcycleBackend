@@ -12,6 +12,8 @@ export class productRepository {
         private _brandModel: Model<Product>,
         @Inject('CATRGORY_MODEL')
         private _categoryModel: Model<Product>,
+        @Inject('REVIEW_MODEL')
+        private _reviewModel: Model<any>
     ) { }
     //for create brand 
     async createBrand(brandName: CreateProductDto){
@@ -162,7 +164,30 @@ async findAllProduct(){
    return result
 }
 async findProductDetails(id:string){
- return await this._productModel.findById({_id:id}).populate('brand').populate('category')
+     
+let data= await this._reviewModel.findOne({product:id})
+const obj={}
+let total=0
+let Total=0
+ data=data['ratings_review']
+ data.forEach((res:any)=>{
+    
+    res=res['ratings']
+        total+=res
+     if(!obj[res]){
+    obj[res]=1
+     }else{
+      obj[res]+=1 
+     }
+    })
+   Total =total
+    total=total/data.length 
+    
+
+    
+
+  const product=await this._productModel.findById({_id:id}).populate('brand').populate('category')
+  return{ total,obj,product,Total}
 }  
 async findAllProductAdmin(){
     return await this._productModel.find().populate('brand')

@@ -91,4 +91,17 @@ export class UsersController {
   loadWallet(@Query() id:string ){
 return this.usersService.loadWallet(id)
   }
+  @Post('review')
+  addReview(@Body() data:any ){
+   return this.usersService.addReview(data)
+  }
+
+
+  @Get('review')
+  Review(@Query() id:string ){
+    console.log(id,'this is review');
+    
+   return this.usersService.Review(id)
+  }
+  
 }

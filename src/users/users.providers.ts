@@ -3,6 +3,7 @@ import { UserSchema } from '../schemas/users.schema';
 import { cartSchema } from 'src/schemas/cart.schema';
 import { wishlistSchema } from 'src/schemas/wishlist.schema';
 import { orderSchema } from 'src/schemas/order.schema';
+import { ratings_reviewSchema } from 'src/schemas/ratings-review.schema';
 
 
 export const usersProviders = [
@@ -41,6 +42,15 @@ export const orderProviders=[
     provide: 'ORDER_MODEL',
     useFactory: (connection: Connection) =>
       connection.model('order', orderSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+]
+
+export const reviewProviders=[
+  {
+    provide: 'REVIEW_MODEL',
+    useFactory: (connection: Connection) =>
+      connection.model('review', ratings_reviewSchema),
     inject: ['DATABASE_CONNECTION'],
   },
 ]
