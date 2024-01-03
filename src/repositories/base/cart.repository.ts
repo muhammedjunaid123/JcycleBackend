@@ -31,9 +31,12 @@ export class cartRepository {
           HttpStatus.FOUND
         )
       } else {
+        
+        
         return await this._cartModel.findOneAndUpdate({ user: user }, { $push: { product: { id: id, count: 1 } }, $inc: { TotalAmount: price } })
       }
     } else {
+
 
 
       const data = new this._cartModel({
@@ -42,11 +45,12 @@ export class cartRepository {
           {
             id: id,
             count: 1,
-            TotalAmount: price
           }
-
-        ]
+        ],
+        TotalAmount: price
       })
+      
+       
       return await data.save()
     }
   }

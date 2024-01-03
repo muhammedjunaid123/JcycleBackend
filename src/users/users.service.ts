@@ -218,4 +218,13 @@ export class UsersService {
   Review(id:string){
      return this._reviewRepository.Review(id)
   }
+  userData(user:string){
+    
+    const decoded = jwtDecode(user['id']);
+  return this._UserRepository.userData(decoded['token'])
+  }
+  updateName(user:string,name:string){
+    const decoded = jwtDecode(user['id']);
+    return this._UserRepository.updateName(decoded['token'],name)
+  }
 }

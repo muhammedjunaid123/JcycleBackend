@@ -56,6 +56,10 @@ export class ProductController {
   findAllProductDetail(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.findAllProductDetail(id);
   }
+  @Get('productDetailAdmin')
+  productDetailAdmin(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return this.productService.productDetailAdmin(id);
+  }
 
   //to get all brandDetails
   @Get('brandDetails')
@@ -66,6 +70,7 @@ export class ProductController {
   findcategoryDetails(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.categoryDetails(id);
   }
+  
   // this will update the product 
   @Patch('id')
   productUpdate(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
@@ -95,16 +100,9 @@ export class ProductController {
   }
   @Get('filter')
   filter(@Query() filter: CreateProductDto) {
-    console.log(filter, 'this from filter get option');  
-    console.log(filter.brand);
-    if( Boolean(filter.brake_type)!=true||false){
-      console.log('error');
-      
-    }
-    console.log(filter.brake_type);
-    console.log(filter.suspension);
+   
     
-    // return this.productService.filterProduct(filter)
+    return this.productService.filterProduct(filter)
 
   }
 

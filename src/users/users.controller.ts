@@ -99,9 +99,17 @@ return this.usersService.loadWallet(id)
 
   @Get('review')
   Review(@Query() id:string ){
-    console.log(id,'this is review');
-    
    return this.usersService.Review(id)
+  }
+  @Get('userData')
+  userData(@Query() user:string ){
+  return this.usersService.userData(user)
+  }
+  @Post('updateName')
+  updateName(@Query() user:string,@Body() name:string ){
+   
+    
+  return this.usersService.updateName(user,name)
   }
   
 }

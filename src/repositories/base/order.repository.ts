@@ -52,6 +52,17 @@ export class orderRepository {
             
               
         }
+        if(value==='cancelled'){
+            const data= await this._userModel.findByIdAndUpdate({_id:user},{$inc:{wallet:Total},$push: {
+                    walletHistory: {
+                      date: new Date(),
+                      amount: Total,
+                      description: `Refunded for order cancelled - Order ${orderID}`,
+                    },
+                  },})
+                
+                  
+            }
       
         
         

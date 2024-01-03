@@ -16,13 +16,13 @@ export class productRepository {
         private _reviewModel: Model<any>
     ) { }
     //for create brand 
-    async createBrand(brandName: CreateProductDto){
+    async createBrand(brandName: CreateProductDto) {
         const { name } = brandName;
-        if(name.trim()===''){
-            throw new HttpException (
+        if (name.trim() === '') {
+            throw new HttpException(
                 'enter value!!!!',
                 HttpStatus.NOT_ACCEPTABLE
-              ) 
+            )
         }
         // Check if the brand with the given name already exists
         const existingBrand = await this._brandModel.findOne({ Brand_name: name });
@@ -31,8 +31,8 @@ export class productRepository {
             throw new HttpException(
                 `Brand with name '${name}' already exists.`,
                 HttpStatus.BAD_REQUEST,
-              );    
-         
+            );
+
         }
 
         // If the brand doesn't exist, create a new one
@@ -46,11 +46,11 @@ export class productRepository {
     // create category 
     async createCategory(categoryName: CreateProductDto) {
         const { name } = categoryName
-        if(name.trim()===''){
-            throw new HttpException (
+        if (name.trim() === '') {
+            throw new HttpException(
                 'enter value!!!!',
                 HttpStatus.NOT_ACCEPTABLE
-              ) 
+            )
         }
         const existingBrand = await this._categoryModel.findOne({ category_name: name });
 
@@ -58,8 +58,8 @@ export class productRepository {
             throw new HttpException(
                 `category with name '${name}' already exists.`,
                 HttpStatus.BAD_REQUEST,
-              );
-         
+            );
+
         }
 
         const category = new this._categoryModel({
@@ -69,11 +69,11 @@ export class productRepository {
     }
 
     // create the product 
-    async createProduct(productData: CreateProductDto,img:any,res:any) {
-      const image=[]
-             for(let f of img){
-           image.push(f.secure_url)
-             }
+    async createProduct(productData: CreateProductDto, img: any, res: any) {
+        const image = []
+        for (let f of img) {
+            image.push(f.secure_url)
+        }
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = productData
 
         const product = new this._productModel({
@@ -86,19 +86,19 @@ export class productRepository {
             price: price,
             stock: stock,
             suspension: suspension,
-            image:image
+            image: image
         })
         await product.save();
         return res.status(HttpStatus.CREATED).json({
-  
+
         });
-        
+
     }
     //update the product 
     async productUpdate(id: string, UpdateProduct: UpdateProductDto) {
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
-        
-        
+
+
         return await this._productModel.findByIdAndUpdate({ _id: id }, {
             $set: {
                 name: name,
@@ -110,18 +110,18 @@ export class productRepository {
                 price: price,
                 stock: stock,
                 suspension: suspension,
-               
+
             }
         })
     }
     //update the brand
     async brandUpdate(id: string, UpdateBrand: UpdateProductDto) {
         const { name } = UpdateBrand
-        if(name.trim()===''){
-            throw new HttpException (
+        if (name.trim() === '') {
+            throw new HttpException(
                 'enter value!!!!',
                 HttpStatus.NOT_ACCEPTABLE
-              ) 
+            )
         }
         return await this._brandModel.findByIdAndUpdate({ _id: id }, {
             $set: {
@@ -132,11 +132,11 @@ export class productRepository {
 
     async categoryUpdate(id: string, Updatecategory: UpdateProductDto) {
         const { name } = Updatecategory
-        if(name.trim()===''){
-            throw new HttpException (
+        if (name.trim() === '') {
+            throw new HttpException(
                 'enter value!!!!',
                 HttpStatus.NOT_ACCEPTABLE
-              ) 
+            )
         }
         return await this._categoryModel.findByIdAndUpdate({ _id: id }, {
             $set: {
@@ -147,90 +147,117 @@ export class productRepository {
 
     }
 
-   async findAllBrand(){
+    async findAllBrand() {
         return await this._brandModel.find()
     }
-    async findAllcategory(){
+    async findAllcategory() {
         return await this._categoryModel.find()
     }
-async findAllProduct(){
-   const data= await this._productModel.find({isBlocked:false}).populate('brand')
-   const result=data.filter((res)=>{
-    res=res['brand']
-    if( res['isBlocked']===false){
-        return res
+    async findAllProduct() {
+        const data = await this._productModel.find({ isBlocked: false }).populate('brand')
+        const result = data.filter((res) => {
+            res = res['brand']
+            if (res['isBlocked'] === false) {
+                return res
+            }
+        })
+        return result
     }
-   })
-   return result
-}
-async findProductDetails(id:string){
-     
-let data= await this._reviewModel.findOne({product:id})
-const obj={}
-let total=0
-let Total=0
- data=data['ratings_review']
- data.forEach((res:any)=>{
-    
-    res=res['ratings']
-        total+=res
-     if(!obj[res]){
-    obj[res]=1
-     }else{
-      obj[res]+=1 
-     }
-    })
-   Total =total
-    total=total/data.length 
-    
+    async ProductDetails(id: string) {
+        return await this._productModel.findById({ _id: id }).populate('brand').populate('category')
+    }
+    async findProductDetails(id: string) {
 
-    
+        const obj = {}
+        let total = 0
+        let Total = 0
+        let data = await this._reviewModel.findOne({ product: id })
+        if (!data) {
+            const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
+            return { total, obj, product, Total }
+        }
+        data = data['ratings_review']
+        data.forEach((res: any) => {
 
-  const product=await this._productModel.findById({_id:id}).populate('brand').populate('category')
-  return{ total,obj,product,Total}
-}  
-async findAllProductAdmin(){
-    return await this._productModel.find().populate('brand')
-}
-
-async brandDetails(id:string){
-    return await this._brandModel.findById({_id:id})
-}
-// to block or unblock the product
-async productBlock_and_unblock(id:string,productData:UpdateProductDto){
-    const {isBlocked}=productData
-    return await this._productModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:isBlocked}})   
-  }
-
-  // to block or unblock the category
-  async categoryblock(id:string,productData:UpdateProductDto){
-    
-     const {isBlocked}=productData
-    return await this._categoryModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:isBlocked}})
-  }
-
-  // to block or unblock the brand
-  async brandBlock(id:string,brandData:UpdateProductDto){
-      console.log(brandData);
-    const {isBlocked}=brandData
-    
-    return await this._brandModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:isBlocked}})
-  }
-  async categoryDetails(id:string){
-    return await this._categoryModel.findById({_id:id})
-}
-
-async findBestSeller(){
-    return await this._productModel.find().populate('brand') .limit(12)
-}
-async filter(filter:CreateProductDto){
-    const{brake_type,brand,category,suspension}=filter
-       
+            res = res['ratings']
+            total += res
+            if (!obj[res]) {
+                obj[res] = 1
+            } else {
+                obj[res] += 1
+            }
+        })
+        Total = total
+        total = total / data.length
 
 
-    const data= await this._productModel.find({brake_type:brake_type,brand:brand,category:category,suspension:suspension}).populate('brand')
-    console.log(data);
-    
-    return data
-}
+
+
+        const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
+        return { total, obj, product, Total }
+    }
+    async findAllProductAdmin() {
+        return await this._productModel.find().populate('brand')
+    }
+
+    async brandDetails(id: string) {
+        return await this._brandModel.findById({ _id: id })
+    }
+    // to block or unblock the product
+    async productBlock_and_unblock(id: string, productData: UpdateProductDto) {
+        const { isBlocked } = productData
+        return await this._productModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+    }
+
+    // to block or unblock the category
+    async categoryblock(id: string, productData: UpdateProductDto) {
+
+        const { isBlocked } = productData
+        return await this._categoryModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+    }
+
+    // to block or unblock the brand
+    async brandBlock(id: string, brandData: UpdateProductDto) {
+        console.log(brandData);
+        const { isBlocked } = brandData
+
+        return await this._brandModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+    }
+    async categoryDetails(id: string) {
+        return await this._categoryModel.findById({ _id: id })
+    }
+
+    async findBestSeller() {
+        return await this._productModel.find().populate('brand').limit(12)
+    }
+    async filter(filter: CreateProductDto) {
+        let obj = {}
+        console.log(filter);
+
+        const { brake_type, brand, category, suspension, gears } = filter
+        console.log(brake_type, 'break');
+
+        if (brake_type == 'true' || brake_type == 'false') {
+            obj['brake_type'] = brake_type
+        }
+        if (suspension == 'true' || suspension == 'false' ) {
+            obj['suspension'] = suspension
+        }
+        if (gears == 'true' || gears == 'false' ) {
+            obj['gears'] = gears
+        }
+        if (brand !== '') {
+            obj['brand'] = brand
+        }
+        if (category !== '') {
+            obj['category'] = category
+        }
+
+        console.log(obj, 'this is obj');
+
+        const data = await this._productModel.find(obj).populate('brand')
+        console.log(data);
+
+        return data
+    }
 }

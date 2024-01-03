@@ -39,6 +39,9 @@ const image= await this._image.upload(files);
   findAllProductDetail(id:string){
     return this._productRepository.findProductDetails(id)
   }
+  productDetailAdmin(id:string){
+    return this._productRepository.ProductDetails(id)
+  }
   brandDetails(id:string){
     return this._productRepository.brandDetails(id)
   }
@@ -80,6 +83,8 @@ const image= await this._image.upload(files);
   }
 
   filterProduct(filter:CreateProductDto){
+  
+          
     return this._productRepository.filter(filter)
   }
  

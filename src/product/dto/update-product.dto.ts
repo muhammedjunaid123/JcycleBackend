@@ -7,9 +7,9 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
     category: Types.ObjectId | string;
     price: number;
     stock: number;
-    gears: boolean;
-    brake_type: boolean;
-    suspension: boolean;
+    gears: string;
+    brake_type: string;
+    suspension: string;
     cycle_Details: string;
     image:String[]  
     isBlocked:boolean

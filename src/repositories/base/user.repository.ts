@@ -95,4 +95,10 @@ export class UserRepository {
   async loadWallet(id:string){
     return await this._userModel.findById({_id:id})
   }
+ async userData(user:string){
+    return await this._userModel.findById({_id:user})
+  }
+  async updateName(user:string,name:string){
+    return await this._userModel.findByIdAndUpdate({_id:user},{$set:{name:name['name']}})
+  }
 }
