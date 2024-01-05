@@ -50,66 +50,66 @@ export class UsersController {
   }
 
   @Get('wishlist')
-  wishlist(@Query() user:string) {
+  wishlist(@Query() user: string) {
     return this.usersService.wishlist(user)
   }
   @Get('cart')
-  cart(@Query() user:string) {
+  cart(@Query() user: string) {
     return this.usersService.cart(user)
   }
   @Patch('cart')
-  cartRemove(@Body() data:CreateUserDto) {
+  cartRemove(@Body() data: CreateUserDto) {
     return this.usersService.cartRemove(data)
   }
   @Patch('cartUpdate')
-  cartUpdate(@Body() data:CreateUserDto) {
-     console.log(data);
-     
-    
+  cartUpdate(@Body() data: CreateUserDto) {
+    console.log(data);
+
+
     return this.usersService.cartUpdate(data)
   }
 
   @Post('cheakout')
-  addOrder(@Body() data:any){
- 
-     return this.usersService.addOrder(data)
-  } 
+  addOrder(@Body() data: any) {
+
+    return this.usersService.addOrder(data)
+  }
   @Get('order')
-  loadOrder(@Query() id:string){
+  loadOrder(@Query() id: string) {
     console.log(id);
-    
-      return this.usersService.loadOrder(id)
+
+    return this.usersService.loadOrder(id)
   }
 
   @Patch('orderStatus')
-  orderStatusUpdate(@Body() data:any){
- 
-  return this.usersService.orderStatusUpdate(data)
-  
+  orderStatusUpdate(@Body() data: any) {
+
+    return this.usersService.orderStatusUpdate(data)
+
   }
   @Get('wallet')
-  loadWallet(@Query() id:string ){
-return this.usersService.loadWallet(id)
+  loadWallet(@Query() id: string) {
+    return this.usersService.loadWallet(id)
   }
   @Post('review')
-  addReview(@Body() data:any ){
-   return this.usersService.addReview(data)
+  addReview(@Body() data: any) {
+    return this.usersService.addReview(data)
   }
 
 
   @Get('review')
-  Review(@Query() id:string ){
-   return this.usersService.Review(id)
+  Review(@Query() id: string) {
+    return this.usersService.Review(id)
   }
   @Get('userData')
-  userData(@Query() user:string ){
-  return this.usersService.userData(user)
+  userData(@Query() user: string) {
+    return this.usersService.userData(user)
   }
   @Post('updateName')
-  updateName(@Query() user:string,@Body() name:string ){
-   
-    
-  return this.usersService.updateName(user,name)
+  updateName(@Query() user: string, @Body() name: string) {
+
+
+    return this.usersService.updateName(user, name)
   }
-  
+
 }

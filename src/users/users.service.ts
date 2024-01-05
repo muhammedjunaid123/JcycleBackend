@@ -213,7 +213,14 @@ export class UsersService {
   addReview(data:any){
    const{user,review,ratings,productID} = data
    const decoded = jwtDecode(user);
-   return this._reviewRepository.addReview(decoded['token'],review,ratings,productID)
+   
+   if(review.trim()===''){
+   throw new HttpException(
+      'review can be null',
+      HttpStatus.BAD_REQUEST,
+    )
+   }
+   return this._reviewRepository.addReview(decoded['token'],review.trim(),ratings,productID)
   }
   Review(id:string){
      return this._reviewRepository.Review(id)

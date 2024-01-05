@@ -36,7 +36,7 @@ export class orderRepository {
         return data1
     }
     async loadOrder(user: string) {
-        return await this._orderModel.find().populate('product.id').populate('user')
+        return await this._orderModel.find().populate('product.id').populate('user');
     }
 
     async orderStatusUpdate(user: string, orderID: string, value: string,Total:number) {
