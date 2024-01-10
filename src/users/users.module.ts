@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { cartProviders, orderProviders, reviewProviders, usersProviders, wishlistProviders } from './users.providers';
+import { addressProviders, cartProviders, orderProviders, rentProviders, reviewProviders, usersProviders, wishlistProviders } from './users.providers';
 import { DatabaseModule } from 'src/config/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -13,6 +13,9 @@ import { brandProviders, categoryProviders, productProviders } from 'src/product
 import { productRepository } from 'src/repositories/base/product.repository';
 import { orderRepository } from 'src/repositories/base/order.repository';
 import { reviewRepository } from 'src/repositories/base/review.repository';
+import { rentRepository } from 'src/repositories/base/rent.repository';
+import { ImageService } from 'src/image/image.service';
+import { addressRepository } from 'src/repositories/base/address.repository';
 
 
 @Module({
@@ -27,7 +30,7 @@ import { reviewRepository } from 'src/repositories/base/review.repository';
   controllers: [UsersController],
   providers: [UsersService, ...usersProviders, JwtModule, UserRepository, cartRepository, wishlistRepository,
      ...cartProviders, ...wishlistProviders, ...productProviders, ...brandProviders, ...categoryProviders,
-     orderRepository,...orderProviders,...reviewProviders,reviewRepository
+     orderRepository,...orderProviders,...reviewProviders,reviewRepository,...rentProviders,rentRepository,ImageService,...addressProviders,addressRepository
   ],
   exports: [UsersService],
 

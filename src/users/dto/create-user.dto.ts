@@ -42,3 +42,29 @@ export class CreateUserDto {
   price: number;
 
 }
+
+export class rentdto {
+ 
+  @IsString()
+  @IsNotEmpty()
+  name: string
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+ 
+  @IsString()
+  @IsNotEmpty()
+  cycle_Details: string
+  
+  @IsString()
+  @IsNotEmpty()
+  location: string
+
+  @IsString()
+  @IsNotEmpty()
+  owner: string
+
+  image:any
+
+}

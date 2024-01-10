@@ -14,9 +14,7 @@ export class UserRepository {
   async createUser(user: CreateUserDto): Promise<User> {
 
     try {
-
-      
-      const { name, email, Mobile, password  } = user;
+      const { name, email, Mobile, password } = user;
       const exUser = await this._userModel.findOne({ email: email })
 
       if (exUser) {
@@ -43,9 +41,9 @@ export class UserRepository {
         password: hashedPassword,
       });
       return await createdUser.save();
-      
 
-    } catch (error) { 
+
+    } catch (error) {
       throw new HttpException(
         error,
         HttpStatus.BAD_REQUEST,
@@ -55,10 +53,10 @@ export class UserRepository {
 
   }
   // user login 
-  async SignIn(user: CreateUserDto,res:any) {
+  async SignIn(user: CreateUserDto, res: any) {
     try {
-            
-              
+
+
       return await this._userModel.findOne({ email: user.email })
 
     } catch (error) {
@@ -75,30 +73,30 @@ export class UserRepository {
     return await this._userModel.findOne({ _id: userId });
   }
 
-  async findAlluser(){
+  async findAlluser() {
     return await this._userModel.find()
   }
   // to block or unblock the user
- async userBlock_and_unblock(id:string,userdata:UpdateUserDto){
-  const {isBlocked}=userdata
+  async userBlock_and_unblock(id: string, userdata: UpdateUserDto) {
+    const { isBlocked } = userdata
 
-    return await this._userModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:isBlocked}})   
-  }
-
- async userDetails(id:string){
-    return await this._userModel.findById({_id:id})
-  }
-  async verified(id:string){
-    return await this._userModel.findByIdAndUpdate({_id:id},{$set:{isVerified:true}})
+    return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
   }
 
-  async loadWallet(id:string){
-    return await this._userModel.findById({_id:id})
+  async userDetails(id: string) {
+    return await this._userModel.findById({ _id: id })
   }
- async userData(user:string){
-    return await this._userModel.findById({_id:user})
+  async verified(id: string) {
+    return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isVerified: true } })
   }
-  async updateName(user:string,name:string){
-    return await this._userModel.findByIdAndUpdate({_id:user},{$set:{name:name['name']}})
+
+  async loadWallet(id: string) {
+    return await this._userModel.findById({ _id: id })
+  }
+  async userData(user: string) {
+    return await this._userModel.findById({ _id: user })
+  }
+  async updateName(user: string, name: string) {
+    return await this._userModel.findByIdAndUpdate({ _id: user }, { $set: { name: name['name'] } })
   }
 }

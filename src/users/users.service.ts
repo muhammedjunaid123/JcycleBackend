@@ -12,6 +12,10 @@ import { wishlistRepository } from 'src/repositories/base/wishlist.repository';
 import { jwtDecode } from "jwt-decode";
 import { orderRepository } from 'src/repositories/base/order.repository';
 import { reviewRepository } from 'src/repositories/base/review.repository';
+import { ImageService } from 'src/image/image.service';
+import { address, rent } from './entities/user.entity';
+import { rentRepository } from 'src/repositories/base/rent.repository';
+import { addressRepository } from 'src/repositories/base/address.repository';
 
 @Injectable()
 export class UsersService {
@@ -20,19 +24,19 @@ export class UsersService {
     private _jwtService: JwtService,
     private _mailerService: MailerService,
     private _wishlistRepository: wishlistRepository,
-    private _orderRepository:orderRepository,
-    private _reviewRepository:reviewRepository
+    private _orderRepository: orderRepository,
+    private _reviewRepository: reviewRepository,
+    private _image: ImageService,
+    private _rentRepository: rentRepository,
+    private _addressRepository:addressRepository
   ) {
 
   }
   //service for user registration
   async SignUp(createUserDto: CreateUserDto, res: Response) {
 
-    const userdata = await this._UserRepository.createUser(createUserDto)
-    return res.status(HttpStatus.CREATED).json({
-      message: 'success',
-      id: userdata['_id'],
-    });
+   return await this._UserRepository.createUser(createUserDto)
+  
 
   }
 
@@ -182,9 +186,9 @@ export class UsersService {
     return this._cartRepository.cart(decoded['token'])
   }
   cartRemove(data: CreateUserDto) {
-    const { id, user,price,count } = data
+    const { id, user, price, count } = data
     const decoded = jwtDecode(user);
-    return this._cartRepository.cartRemove(id, decoded['token'],price,count)
+    return this._cartRepository.cartRemove(id, decoded['token'], price, count)
   }
   cartUpdate(data: CreateUserDto) {
     const { id, count, user, price } = data
@@ -192,46 +196,65 @@ export class UsersService {
 
     return this._cartRepository.cartUpdate(decoded['token'], id, count, price)
   }
-  addOrder(data:any){
-    const {  user,razorId,paymentMethod } = data
+  addOrder(data: any) {
+    const { user, razorId, paymentMethod } = data
     const decoded = jwtDecode(user);
-    return this._orderRepository.addOrder(decoded['token'],razorId,paymentMethod)
+    return this._orderRepository.addOrder(decoded['token'], razorId, paymentMethod)
   }
-  loadOrder(id:string){
+  loadOrder(id: string) {
     const decoded = jwtDecode(id['id']);
     return this._orderRepository.loadOrder(decoded['token'])
   }
 
-  orderStatusUpdate(data:any){
-    const{user,orderID,value,Total}=data
-    return this._orderRepository.orderStatusUpdate(user['_id'],orderID,value,Total)
+  orderStatusUpdate(data: any) {
+    const { user, orderID, value, Total } = data
+    return this._orderRepository.orderStatusUpdate(user['_id'], orderID, value, Total)
   }
-  loadWallet(id:string){
+  loadWallet(id: string) {
     const decoded = jwtDecode(id['id']);
     return this._UserRepository.loadWallet(decoded['token'])
   }
-  addReview(data:any){
-   const{user,review,ratings,productID} = data
-   const decoded = jwtDecode(user);
-   
-   if(review.trim()===''){
-   throw new HttpException(
-      'review can be null',
-      HttpStatus.BAD_REQUEST,
-    )
-   }
-   return this._reviewRepository.addReview(decoded['token'],review.trim(),ratings,productID)
+  addReview(data: any) {
+    const { user, review, ratings, productID } = data
+    const decoded = jwtDecode(user);
+
+    if (review.trim() === '') {
+      throw new HttpException(
+        'review can be null',
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return this._reviewRepository.addReview(decoded['token'], review.trim(), ratings, productID)
   }
-  Review(id:string){
-     return this._reviewRepository.Review(id)
+  Review(id: string) {
+    return this._reviewRepository.Review(id)
   }
-  userData(user:string){
+  userData(user: string) {
+
+    const decoded = jwtDecode(user['id']);
+    return this._UserRepository.userData(decoded['token'])
+  }
+  updateName(user: string, name: string) {
+    const decoded = jwtDecode(user['id']);
+    return this._UserRepository.updateName(decoded['token'], name)
+  }
+  async addrent(rent_data: rent, files: Array<Express.Multer.File>) {
+    const image = await this._image.upload(files);
+    console.log(image);
+
+    return this._rentRepository.addrent(image, rent_data)
+  }
+  loadRentBicycle(){
+    return this._rentRepository.loadRentBicycle()
+  }
+  addAddress(addressData:address,user:string){
+    console.log(user);
     
-    const decoded = jwtDecode(user['id']);
-  return this._UserRepository.userData(decoded['token'])
+    const decoded = jwtDecode(user);
+   return this._addressRepository.addAddress(decoded['token'],addressData)
   }
-  updateName(user:string,name:string){
-    const decoded = jwtDecode(user['id']);
-    return this._UserRepository.updateName(decoded['token'],name)
+  Address(user:string){
+    const decoded = jwtDecode(user);
+    return this._addressRepository.Address(decoded['token'])
   }
 }

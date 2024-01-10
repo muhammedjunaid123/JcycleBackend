@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, rentdto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response, query } from 'express';
 import { log } from 'console';
 import { get } from 'http';
+import { address, rent } from './entities/user.entity';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -110,6 +112,30 @@ export class UsersController {
 
 
     return this.usersService.updateName(user, name)
+  }
+
+  @Post('rent-add')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]))
+  rent_add(@Req() req: Request,
+    @Res() res: Response,
+    @Body() rent_data: rent,
+    @UploadedFiles() files: Array<Express.Multer.File>,) {
+    files = files['image']
+    this.usersService.addrent(rent_data, files)
+
+  }
+
+  @Get('loadRentBicycle')
+  loadRentBicycle(@Query('user') user: string) {
+    return this.usersService.loadRentBicycle()
+  }
+  @Post('address')
+  addAddress(@Body('address') addressData:address,@Body('user') user:string ){
+  return this.usersService.addAddress(addressData,user)
+  }
+  @Get('address')
+  Address(@Query('id') user:string ){
+  return this.usersService.Address(user)
   }
 
 }
