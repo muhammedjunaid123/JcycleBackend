@@ -16,6 +16,7 @@ import { reviewRepository } from 'src/repositories/base/review.repository';
 import { rentRepository } from 'src/repositories/base/rent.repository';
 import { ImageService } from 'src/image/image.service';
 import { addressRepository } from 'src/repositories/base/address.repository';
+import { AuthModule } from 'src/auth/auth.module';
 
 
 @Module({
@@ -25,14 +26,16 @@ import { addressRepository } from 'src/repositories/base/address.repository';
     JwtModule.register({
       global: true,
       secret: process.env.secret,
-      signOptions: { expiresIn: '24hr' },
-    })],
+      signOptions: { expiresIn: '2 days' },
+    }),
+    
+  ],
   controllers: [UsersController],
   providers: [UsersService, ...usersProviders, JwtModule, UserRepository, cartRepository, wishlistRepository,
      ...cartProviders, ...wishlistProviders, ...productProviders, ...brandProviders, ...categoryProviders,
      orderRepository,...orderProviders,...reviewProviders,reviewRepository,...rentProviders,rentRepository,ImageService,...addressProviders,addressRepository
   ],
-  exports: [UsersService],
+  exports: [UsersService,JwtModule],
 
 })
 export class UsersModule { }

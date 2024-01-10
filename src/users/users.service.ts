@@ -63,8 +63,11 @@ export class UsersService {
           );
         }
         const payload = { token: userData._id, role: 'user' };
+        let token=    await this._jwtService.sign(payload)
+        console.log(token);
+        
         return res.status(HttpStatus.CREATED).json({
-          access_token: await this._jwtService.sign(payload),
+          access_token: token,
           message: 'Success',
         });
       } else {

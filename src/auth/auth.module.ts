@@ -15,14 +15,15 @@ import { reviewRepository } from 'src/repositories/base/review.repository';
 import { rentRepository } from 'src/repositories/base/rent.repository';
 import { ImageService } from 'src/image/image.service';
 import { addressRepository } from 'src/repositories/base/address.repository';
+import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
-  imports: [UsersModule, DatabaseModule],
+  imports: [UsersModule, DatabaseModule,ConfigModule],
   controllers: [AuthController],
   providers: [AuthService, UsersService,
     UserRepository,
-    ...usersProviders, JwtService,wishlistRepository,cartRepository,...wishlistProviders,
+    ...usersProviders,JwtService,wishlistRepository,cartRepository,...wishlistProviders,
     ...cartProviders,...productProviders,...brandProviders,...categoryProviders,
     orderRepository,...orderProviders,...reviewProviders,reviewRepository,rentRepository,...rentProviders,ImageService,...addressProviders,addressRepository
   ]

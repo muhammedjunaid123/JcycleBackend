@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -8,12 +8,15 @@ import { AdminModule } from './admin/admin.module';
 import { ProductModule } from './product/product.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ImageModule } from './image/image.module';
+import { AuthService } from './auth/auth.service';
+import { excluded } from './auth/exclude.auth';
 
 
 
 @Module({
   imports: [
     UsersModule, 
+    AuthModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
@@ -33,8 +36,7 @@ import { ImageModule } from './image/image.module';
         from: '"No Reply" <no-reply@localhost>',
       },
       preview: true,
-    }),
-     AuthModule, 
+    }), 
      AdminModule,
       ProductModule,
       ImageModule,
@@ -42,4 +44,11 @@ import { ImageModule } from './image/image.module';
 ,  controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+    .apply(AuthService)
+    .exclude(...excluded)
+    .forRoutes('*')
+  }
+ }

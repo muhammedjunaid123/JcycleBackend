@@ -1,14 +1,31 @@
-import { HttpStatus, Injectable, Req, Res } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NestMiddleware, Req, Res } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { log } from 'console';
 
 
 @Injectable()
-export class AuthService {
-    constructor(
-        private usersService: UsersService
-      ) {}
-
-  
- 
+export class AuthService implements NestMiddleware {
+  constructor(private readonly _jwtService: JwtService) {}
+  async use(req: Request, res: Response, next: NextFunction) {
+    const authHeader = req.headers['authorization'];
+   
+    if (!authHeader || !authHeader.startsWith('Bearer')) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const token = authHeader.split(' ')[1];
+    console.log(token,'THIS IS TOKEN');
+    
+    try {
+      console.log('ENTER');    
+      const decoded = this._jwtService.verify(token,{secret:process.env.secret});
+    
+    } catch (error) {
+      console.log(error);
+      
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    next();
+  }
 }
