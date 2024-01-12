@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 export class CreateProductDto {
-    name: string;
+  name: string;
   brand: Types.ObjectId | string; 
   category: Types.ObjectId | string;
   price: number;

@@ -31,6 +31,8 @@ export class ImageService {
 
       return Promise.all(uploadPromises);
     } catch (error) {
+      console.log(error);
+      
      throw new HttpException(
         'there was some issue with the image please try again',
         HttpStatus.BAD_REQUEST

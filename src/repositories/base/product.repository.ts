@@ -3,6 +3,7 @@ import { CreateProductDto } from "../../product/dto/create-product.dto";
 import { UpdateProductDto } from "src/product/dto/update-product.dto";
 import { Product } from "../../product/entities/product.entity";
 import { Model } from "mongoose";
+import { Response } from "express";
 
 export class productRepository {
     constructor(
@@ -74,6 +75,7 @@ export class productRepository {
         for (let f of img) {
             image.push(f.secure_url)
         }
+
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = productData
 
         const product = new this._productModel({
@@ -95,24 +97,58 @@ export class productRepository {
 
     }
     //update the product 
-    async productUpdate(id: string, UpdateProduct: UpdateProductDto) {
+    async productUpdate(id: string, UpdateProduct: UpdateProductDto, img: any,res:Response) {
+        console.log('enter to repo');
+
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
+        if (img.length === 0) {
+             await this._productModel.findByIdAndUpdate(
+                { _id: id },
+                 {
+                    $set: {
+                    name,
+                    brake_type,
+                    brand,
+                    category,
+                    cycle_Details,
+                    gears,
+                    price,
+                    stock,
+                    suspension,
+
+                }
+            })
+            return res.status(HttpStatus.CREATED).json({
+
+            });
+        }
+      
 
 
-        return await this._productModel.findByIdAndUpdate({ _id: id }, {
-            $set: {
-                name: name,
-                brake_type: brake_type,
-                brand: brand,
-                category: category,
-                cycle_Details: cycle_Details,
-                gears: gears,
-                price: price,
-                stock: stock,
-                suspension: suspension,
+        console.log('enter');
 
-            }
-        })
+         await this._productModel.findByIdAndUpdate(
+            { _id: id },
+            {
+                $set: {
+                    name,
+                    brake_type,
+                    brand,
+                    category,
+                    cycle_Details,
+                    gears,
+                    price,
+                    stock,
+                    suspension,
+                },
+                $push: {
+                    image: { $each: img.map(f => f.secure_url) },
+                },
+            },
+        );
+        return res.status(HttpStatus.CREATED).json({
+
+        });
     }
     //update the brand
     async brandUpdate(id: string, UpdateBrand: UpdateProductDto) {
@@ -240,10 +276,10 @@ export class productRepository {
         if (brake_type == 'true' || brake_type == 'false') {
             obj['brake_type'] = brake_type
         }
-        if (suspension == 'true' || suspension == 'false' ) {
+        if (suspension == 'true' || suspension == 'false') {
             obj['suspension'] = suspension
         }
-        if (gears == 'true' || gears == 'false' ) {
+        if (gears == 'true' || gears == 'false') {
             obj['gears'] = gears
         }
         if (brand !== '') {
@@ -259,5 +295,20 @@ export class productRepository {
         console.log(data);
 
         return data
+    }
+    async imgDelete(index:number,id:string){
+        console.log('enter the repo');
+        
+        await this._productModel.findByIdAndUpdate(
+            id,
+            { $unset: { [`image.${index}`]: 1 } }
+        );
+
+        const result = await this._productModel.findByIdAndUpdate(
+            id,
+            { $pull: { "image": null } },
+            { new: true }
+        );
+        return result
     }
 }

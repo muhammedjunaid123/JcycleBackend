@@ -3,11 +3,8 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import { S3Client } from "@aws-sdk/client-s3";
-import * as multerS3 from 'multer-s3'
-import { query } from 'express';
-import { get } from 'http';
-import { log } from 'console';
+import { Response } from 'express';
+
 
 @Controller('product')
 export class ProductController {
@@ -20,8 +17,10 @@ export class ProductController {
   createProduct(@Req() req: Request,
     @Res() res: Response,
     @Body() product: any,
-    @UploadedFiles() files: Array<Express.Multer.File>,) {
+    @UploadedFiles() files: Array<Express.Multer.File>) {
     files = files['image']
+    console.log(product); 
+    
     return this.productService.createProduct(product, files, res);
   }
   //to get all brand
@@ -70,11 +69,17 @@ export class ProductController {
   findcategoryDetails(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.categoryDetails(id);
   }
-  
+
   // this will update the product 
   @Patch('id')
-  productUpdate(@Query('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.productUpdate(id, updateProductDto);
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]))
+  productUpdate(@Query('id') id: string, @Req() req: Request,
+    @Res() res: Response,
+    @Body() product: any,
+    @UploadedFiles() files: Array<Express.Multer.File>) {
+      console.log(product);
+      files = files['image']
+    return this.productService.productUpdate(id, product, files,res);
   }
   // this will update the brand
   @Patch('brand/id')
@@ -100,10 +105,16 @@ export class ProductController {
   }
   @Get('filter')
   filter(@Query() filter: CreateProductDto) {
-   
-    
+
+
     return this.productService.filterProduct(filter)
 
+  }
+  @Patch('imgDelete')
+  imgDelete(@Body('index') index:number,@Body('id') id:string){
+    console.log('enter1');
+    
+    return this.productService.imgDelete(index,id)
   }
 
 }

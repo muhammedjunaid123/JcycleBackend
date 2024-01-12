@@ -27,8 +27,8 @@ export class AdminRepository {
               
            }else{
              throw new HttpException(
-          'password incorrect',
-          HttpStatus.BAD_REQUEST,
+              'password incorrect',
+             HttpStatus.BAD_REQUEST,
         );
            }
         

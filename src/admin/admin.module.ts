@@ -18,8 +18,8 @@ import { reviewRepository } from 'src/repositories/base/review.repository';
     ConfigModule,
     JwtModule.register({
       global: true,
-      secret: 'HELLO',
-      signOptions: { expiresIn: '60' },
+      secret: process.env.secret,
+      signOptions: { expiresIn:'2 days'},
     })],
   controllers: [AdminController],
   providers: [AdminService,...adminProviders,AdminRepository,JwtModule,productRepository,UserRepository,...usersProviders,...productProviders,...brandProviders,...categoryProviders,...reviewProviders,reviewRepository  ],

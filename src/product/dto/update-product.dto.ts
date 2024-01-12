@@ -3,8 +3,8 @@ import { CreateProductDto } from './create-product.dto';
 import { Types } from 'mongoose';
 export class UpdateProductDto extends PartialType(CreateProductDto) {
     name: string;
-    brand: Types.ObjectId | string; 
-    category: Types.ObjectId | string;
+    brand: any; 
+    category: any;
     price: number;
     stock: number;
     gears: string;
