@@ -32,7 +32,7 @@ export class reviewRepository {
     }
    async Review(id:string){
   
-      const data=await this._reviewModel.findOne({product:id['id']}).populate('product').populate('user')
+      const data=await this._reviewModel.findOne({product:id['id']}).populate('product').populate('user').exec();
       console.log(data);
       
       return data

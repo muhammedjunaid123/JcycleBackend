@@ -13,9 +13,10 @@ import { jwtDecode } from "jwt-decode";
 import { orderRepository } from 'src/repositories/base/order.repository';
 import { reviewRepository } from 'src/repositories/base/review.repository';
 import { ImageService } from 'src/image/image.service';
-import { address, rent } from './entities/user.entity';
+import { address, rent, rentorderDetails } from './entities/user.entity';
 import { rentRepository } from 'src/repositories/base/rent.repository';
 import { addressRepository } from 'src/repositories/base/address.repository';
+import { locationRepository } from 'src/repositories/base/location.repository';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +29,8 @@ export class UsersService {
     private _reviewRepository: reviewRepository,
     private _image: ImageService,
     private _rentRepository: rentRepository,
-    private _addressRepository:addressRepository
+    private _addressRepository:addressRepository,
+    private _locationRepository:locationRepository
   ) {
 
   }
@@ -241,14 +243,17 @@ export class UsersService {
     const decoded = jwtDecode(user['id']);
     return this._UserRepository.updateName(decoded['token'], name)
   }
-  async addrent(rent_data: rent, files: Array<Express.Multer.File>) {
+  async addrent(rent_data: rent, files: Array<Express.Multer.File>,user:string,res:Response) {
     const image = await this._image.upload(files);
-    console.log(image);
+    console.log(image);    
+    const decoded = jwtDecode(user);
+    await this._rentRepository.addrent(image, rent_data,decoded['token'])
+    return res.status(HttpStatus.CREATED).json({
 
-    return this._rentRepository.addrent(image, rent_data)
+    });
   }
-  loadRentBicycle(){
-    return this._rentRepository.loadRentBicycle()
+  loadRentBicycle(data:any){
+    return this._rentRepository.loadRentBicycle(data)
   }
   addAddress(addressData:address,user:string){
     console.log(user);
@@ -260,4 +265,21 @@ export class UsersService {
     const decoded = jwtDecode(user);
     return this._addressRepository.Address(decoded['token'])
   }
+  rentDetail(id:string){
+ return this._rentRepository.rentDetail(id)
+  }
+  addrentOrder(orderDetails:rentorderDetails){
+    let{Date,owner,paymentMethod,razorId,user,productID,totalAmount}=orderDetails
+    const decoded = jwtDecode(user);
+  
+    return this._rentRepository.addrentOrder(orderDetails,decoded['token'])
+  }
+
+  addlocation(data:any ){
+  return this._locationRepository.addLocation(data)
+  }
+  location(){
+    return this._locationRepository.location()
+  }
 }
+

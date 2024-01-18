@@ -6,6 +6,8 @@ import { orderSchema } from 'src/schemas/order.schema';
 import { ratings_reviewSchema } from 'src/schemas/ratings-review.schema';
 import { rentSchema } from 'src/schemas/rent.schema';
 import { addressSchema } from 'src/schemas/address.schema';
+import { rentOrderSchema } from 'src/schemas/rent-order.schema';
+import { locationSchema } from 'src/schemas/location.schema';
 
 
 export const usersProviders = [
@@ -29,7 +31,7 @@ export const cartProviders = [
 ];
 
 
-export const wishlistProviders=[
+export const wishlistProviders = [
   {
     provide: 'WISHLIST_MODEL',
     useFactory: (connection: Connection) =>
@@ -39,7 +41,7 @@ export const wishlistProviders=[
 ]
 
 
-export const orderProviders=[
+export const orderProviders = [
   {
     provide: 'ORDER_MODEL',
     useFactory: (connection: Connection) =>
@@ -48,7 +50,7 @@ export const orderProviders=[
   },
 ]
 
-export const reviewProviders=[
+export const reviewProviders = [
   {
     provide: 'REVIEW_MODEL',
     useFactory: (connection: Connection) =>
@@ -57,7 +59,7 @@ export const reviewProviders=[
   },
 ]
 
-export const rentProviders=[
+export const rentProviders = [
   {
     provide: 'RENT_MODEL',
     useFactory: (connection: Connection) =>
@@ -66,11 +68,30 @@ export const rentProviders=[
   },
 ]
 
-export const addressProviders=[
+export const addressProviders = [
   {
     provide: 'ADDRESS_MODEL',
     useFactory: (connection: Connection) =>
       connection.model('address', addressSchema),
     inject: ['DATABASE_CONNECTION'],
   },
+]
+
+export const rentOrderProviders = [
+  {
+    provide: 'RENT_ORDER_MODEL',
+    useFactory: (connection: Connection) =>
+      connection.model('rentOrder', rentOrderSchema),
+    inject: ['DATABASE_CONNECTION'],
+  }
+]
+
+export const locationProviders = [
+  {
+    
+    provide: 'LOCATION_MODEL',
+    useFactory: (connection: Connection) =>
+      connection.model('location', locationSchema),
+    inject: ['DATABASE_CONNECTION'],
+  }
 ]

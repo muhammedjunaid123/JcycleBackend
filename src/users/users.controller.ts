@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Response, query } from 'express';
 import { log } from 'console';
 import { get } from 'http';
-import { address, rent } from './entities/user.entity';
+import { address, rent, rentorderDetails } from './entities/user.entity';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
@@ -97,8 +97,6 @@ export class UsersController {
   addReview(@Body() data: any) {
     return this.usersService.addReview(data)
   }
-
-
   @Get('review')
   Review(@Query() id: string) {
     return this.usersService.Review(id)
@@ -116,18 +114,20 @@ export class UsersController {
 
   @Post('rent-add')
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]))
-  rent_add(@Req() req: Request,
+  rent_add(
     @Res() res: Response,
     @Body() rent_data: rent,
-    @UploadedFiles() files: Array<Express.Multer.File>,) {
+    @Query('id') userId:string,
+    @UploadedFiles() files: Array<Express.Multer.File>) {
     files = files['image']
-    this.usersService.addrent(rent_data, files)
+    this.usersService.addrent(rent_data, files,userId,res)
 
   }
 
   @Get('loadRentBicycle')
-  loadRentBicycle(@Query('user') user: string) {
-    return this.usersService.loadRentBicycle()
+  loadRentBicycle(@Query() data:any) {
+    
+    return this.usersService.loadRentBicycle(data)
   }
   @Post('address')
   addAddress(@Body('address') addressData:address,@Body('user') user:string ){
@@ -136,6 +136,23 @@ export class UsersController {
   @Get('address')
   Address(@Query('id') user:string ){
   return this.usersService.Address(user)
+  }
+  @Get('rentDetail')
+  rentDetail(@Query('id') id:string){
+     return this.usersService.rentDetail(id)
+  }
+
+  @Post('rentOrder')
+  addrentOrder(@Body() orderDetails:rentorderDetails){
+    return this.usersService.addrentOrder(orderDetails)
+  }
+  @Post('addlocation')
+  addlocation(@Body() data:any){
+    return this.usersService.addlocation(data)
+  }
+  @Get('location')
+  location(){
+    return this.usersService.location()
   }
 
 }

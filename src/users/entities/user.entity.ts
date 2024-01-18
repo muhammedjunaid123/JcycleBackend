@@ -30,6 +30,7 @@ export interface rent {
   name: string,
   price: number,
   cycle_Details: string,
+  bookedDate:any,
   location: string,
   owner: string
 }
@@ -45,4 +46,13 @@ export interface address{
   mobile:number,
   pin:number 
   state:string 
+  }
+  export interface rentorderDetails{
+    user:any,
+    Date:any,
+    owner:any,
+    razorId: any,
+    paymentMethod:string,
+    productID:any,
+    totalAmount:number
   }

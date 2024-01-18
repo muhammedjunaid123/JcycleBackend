@@ -5,7 +5,7 @@ import { UsersModule } from 'src/users/users.module';
 import { DatabaseModule } from 'src/config/database/database.module';
 import { UserRepository } from 'src/repositories/base/user.repository';
 import { UsersService } from 'src/users/users.service';
-import { addressProviders, cartProviders, orderProviders, rentProviders, reviewProviders, usersProviders, wishlistProviders } from 'src/users/users.providers';
+import { addressProviders, cartProviders, locationProviders, orderProviders, rentOrderProviders, rentProviders, reviewProviders, usersProviders, wishlistProviders } from 'src/users/users.providers';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { wishlistRepository } from 'src/repositories/base/wishlist.repository';
 import { cartRepository } from 'src/repositories/base/cart.repository';
@@ -16,6 +16,7 @@ import { rentRepository } from 'src/repositories/base/rent.repository';
 import { ImageService } from 'src/image/image.service';
 import { addressRepository } from 'src/repositories/base/address.repository';
 import { ConfigModule } from '@nestjs/config';
+import { locationRepository } from 'src/repositories/base/location.repository';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { ConfigModule } from '@nestjs/config';
     UserRepository,
     ...usersProviders,JwtService,wishlistRepository,cartRepository,...wishlistProviders,
     ...cartProviders,...productProviders,...brandProviders,...categoryProviders,
-    orderRepository,...orderProviders,...reviewProviders,reviewRepository,rentRepository,...rentProviders,ImageService,...addressProviders,addressRepository
+    orderRepository,...orderProviders,...reviewProviders,reviewRepository,rentRepository,...rentProviders,ImageService,...addressProviders,addressRepository,
+    ...rentOrderProviders,...locationProviders,locationRepository
   ]
 })
 export class AuthModule { }
