@@ -10,6 +10,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { ImageModule } from './image/image.module';
 import { AuthService } from './auth/auth.service';
 import { excluded } from './auth/exclude.auth';
+import { ServicerModule } from './servicer/servicer.module';
 
 
 
@@ -40,6 +41,7 @@ import { excluded } from './auth/exclude.auth';
      AdminModule,
       ProductModule,
       ImageModule,
+      ServicerModule,
   ]
 ,  controllers: [AppController],
   providers: [AppService],

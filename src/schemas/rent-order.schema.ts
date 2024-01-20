@@ -8,6 +8,10 @@ export const rentOrderSchema = new mongoose.Schema(
         end: { type: Date, required: true },
         totalAmount: { type: Number, required: true },
         owner: { type: mongoose.Schema.ObjectId, ref: 'User' },
+        status: {
+            type: String,
+            default: 'pending'
+        },
     },
     { timestamps: true },
 );

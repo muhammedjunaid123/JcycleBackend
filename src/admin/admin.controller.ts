@@ -58,4 +58,17 @@ export class AdminController {
   remove(@Param('id') id: string) {
     return this.adminService.remove(+id);
   }
+
+  @Get('')
+  getRentProduct(){
+   
+    return this.adminService.getRentProduct()
+  }
+  
+  @Patch('rentBlock')
+  rentBlock(@Body('id') id:string,@Body('isBlocked') isBlocked:boolean){
+    console.log(id);
+    
+   return this.adminService.rentBlock(id,isBlocked)
+  }
 }

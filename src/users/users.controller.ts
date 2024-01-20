@@ -154,5 +154,21 @@ export class UsersController {
   location(){
     return this.usersService.location()
   }
+  @Get('rentHistory')
+  rentHistory(@Query('id') id:string){
+      return this.usersService.rentHistory(id)
+  }
+  @Get('getUserRentProduct')
+  getUserRentProduct(@Query('id') id:string){
+    return this.usersService.getUserRentProduct(id)
+  }
+  @Patch('blockRentProduct')
+  blockRentProduct(@Body() productId:any){
+    return this.usersService.blockRentProduct(productId)
+  }
+  @Patch('changeStatusRent')
+  changeStatusRent(@Body() data:any ){
+   return this.usersService.changeStatusRent(data)
 
+  }
 }

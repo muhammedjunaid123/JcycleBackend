@@ -281,5 +281,21 @@ export class UsersService {
   location(){
     return this._locationRepository.location()
   }
+  rentHistory(id:string){
+    const decoded = jwtDecode(id);
+    return this._rentRepository.rentHistory(decoded['token'])
+  }
+  getUserRentProduct(id:string){
+    const decoded = jwtDecode(id);
+    return this._rentRepository.getUserRentProduct(decoded['token'])
+  }
+  blockRentProduct(productId:any){    
+   
+    return this._rentRepository.blockRentProduct(productId)
+  }
+  changeStatusRent(data:any){
+  
+    return this._rentRepository.changeStatusRent(data)
+  }
 }
 

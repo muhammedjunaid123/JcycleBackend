@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject } from "@nestjs/common";
 import { log } from "console";
 import { jwtDecode } from "jwt-decode";
 import { Model } from "mongoose";
-import { rent, rentorderDetails } from "src/users/entities/user.entity";
+import { User, rent, rentorderDetails } from "src/users/entities/user.entity";
 import { format } from 'date-fns-tz';
 
 export class rentRepository {
@@ -10,7 +10,9 @@ export class rentRepository {
     @Inject('RENT_MODEL')
     private _rentModel: Model<rent>,
     @Inject('RENT_ORDER_MODEL')
-    private _rentOrderModel: Model<any>
+    private _rentOrderModel: Model<any>,
+    @Inject('USER_MODEL')
+    private _userModel: Model<User>,
   ) { }
   async addrent(img: any, rent_data: rent, user: string) {
     try {
@@ -77,7 +79,9 @@ export class rentRepository {
                   }
                 }
               }
-            ]
+            ],
+            isBlocked:false,
+            adminisBlocked:false
           }
         }
       ]);
@@ -112,5 +116,38 @@ export class rentRepository {
     return await data.save()
 
 
+  }
+ async rentHistory(id:string){
+ return this._rentOrderModel.find({user:id}).populate('rentProduct').populate('owner').populate('user')
+  }
+  async getUserRentProduct(id:string){
+    return this._rentModel.find({owner:id}).populate('owner')
+  }
+  async blockRentProduct(productID:any){
+      const {id,isBlocked}=productID
+      if(isBlocked===false){
+        return this._rentModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:true}})
+      }else{
+        return this._rentModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:false}})
+      }
+  }
+  async changeStatusRent(data:any){
+   const {itemId,totalAmount,user}=data
+   const value= await this._userModel.findByIdAndUpdate({_id:user},{$inc:{wallet:totalAmount},$push: {
+    walletHistory: {
+      date: new Date(),
+      amount: totalAmount,
+      description: `Refunded for Rent cancelled- RentId : ${itemId}`,
+    },
+  },})
+  return this._rentOrderModel.findByIdAndUpdate({_id:itemId},{$set:{status:'cancelled'}})
+
+  }
+ async getRentProduct(){
+  return this._rentModel.find().populate('owner')
+  }
+  async rentBlock(id:string,isBlocked:boolean){
+   
+    return this._rentModel.findByIdAndUpdate({_id:id},{$set:{adminisBlocked:!isBlocked}},{upsert:true})
   }
 }
