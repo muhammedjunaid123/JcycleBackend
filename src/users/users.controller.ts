@@ -171,4 +171,28 @@ export class UsersController {
    return this.usersService.changeStatusRent(data)
 
   }
+  @Get('getAllService')
+  getAllService(){
+    return this.usersService.getAllService()
+  }
+  @Post('addServiceOrder')
+  addServiceOrder(@Body() data:any){
+  return this.usersService.addServiceOrder(data)
+  }
+  @Get('getUserserviceHistory')
+  getUserserviceHistory(@Query('id') id:string){
+    return this.usersService.getUserserviceHistory(id)
+  }
+  @Patch('serviceOrderCancel')
+  serviceOrderCancel(@Body() data:any){
+    return this.usersService.serviceOrderCancel(data)
+  }
+  @Post('rentreview')
+  addrentReview(@Body() data: any) {
+    return this.usersService.addrentReview(data)
+  }
+  @Get('rentreview')
+  rentReview(@Query() id: string) {
+    return this.usersService.rentReview(id)
+  }
 }

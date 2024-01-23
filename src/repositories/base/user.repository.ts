@@ -4,11 +4,12 @@ import { User } from "../../users/entities/user.entity";
 import { Model } from "mongoose";
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
-import { UpdateProductDto } from "src/product/dto/update-product.dto";
-export class UserRepository {
+import { IUserRepository } from "../interfaces/user-repository.interface";
+export class UserRepository implements IUserRepository {
   constructor(
     @Inject('USER_MODEL')
     private _userModel: Model<User>,
+
   ) { }
   //createUser 
   async createUser(user: CreateUserDto): Promise<User> {
@@ -53,7 +54,7 @@ export class UserRepository {
 
   }
   // user login 
-  async SignIn(user: CreateUserDto, res: any) {
+  async SignIn(user: CreateUserDto): Promise<User> {
     try {
 
 
@@ -73,30 +74,30 @@ export class UserRepository {
     return await this._userModel.findOne({ _id: userId });
   }
 
-  async findAlluser() {
+  async findAlluser(): Promise<User[]> {
     return await this._userModel.find()
   }
   // to block or unblock the user
-  async userBlock_and_unblock(id: string, userdata: UpdateUserDto) {
+  async userBlock_and_unblock(id: string, userdata: UpdateUserDto): Promise<User> {
     const { isBlocked } = userdata
 
     return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
   }
 
-  async userDetails(id: string) {
+  async userDetails(id: string): Promise<User> {
     return await this._userModel.findById({ _id: id })
   }
-  async verified(id: string) {
+  async verified(id: string): Promise<User> {
     return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isVerified: true } })
   }
 
-  async loadWallet(id: string) {
+  async loadWallet(id: string): Promise<User> {
     return await this._userModel.findById({ _id: id })
   }
-  async userData(user: string) {
+  async userData(user: string): Promise<User> {
     return await this._userModel.findById({ _id: user })
   }
-  async updateName(user: string, name: string) {
+  async updateName(user: string, name: string): Promise<User> {
     return await this._userModel.findByIdAndUpdate({ _id: user }, { $set: { name: name['name'] } })
   }
 }

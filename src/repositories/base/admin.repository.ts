@@ -5,14 +5,15 @@ import { CreateAdminDto } from "../../admin/dto/create-admin.dto"
 import { json } from "stream/consumers";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
-export class AdminRepository {
+import { IAdminRepository } from "../interfaces/admin-repository.interface";
+export class AdminRepository implements IAdminRepository {
   constructor(
     @Inject('ADMIN_MODEL')
     private _adminModel: Model<Admin>,
     private _jwtService: JwtService,
   ) { }
   // admin login 
-  async SignIn(user: CreateAdminDto, res:Response) {
+  async SignIn(user: CreateAdminDto, res:Response):Promise<Response> {
     try {
       const { email,password } = user
       const admindata = await this._adminModel.findOne({ email: email })

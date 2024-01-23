@@ -1,8 +1,9 @@
 import { Inject } from "@nestjs/common";
 import { Model } from "mongoose";
-import { User } from "src/users/entities/user.entity";
+import { User, order } from "src/users/entities/user.entity";
+import { IOrderRepository } from "../interfaces/order-repostiory.interface";
 
-export class orderRepository {
+export class orderRepository implements IOrderRepository {
     constructor(
         @Inject('ORDER_MODEL')
         private _orderModel: Model<any>,
@@ -11,7 +12,7 @@ export class orderRepository {
         @Inject('USER_MODEL')
         private _userModel: Model<User>,
     ) { }
-    async addOrder(user: string, razorId: any, paymentMethod: any) {
+    async addOrder(user: string, razorId: any, paymentMethod: any):Promise<order> {
 
         const cartdata = await this._cartModel.findOne({ user: user })
         const product: any[] = cartdata['product']
@@ -35,11 +36,11 @@ export class orderRepository {
      
         return data1
     }
-    async loadOrder(user: string) {
+    async loadOrder(user: string):Promise<order[]> {
         return await this._orderModel.find().populate('product.id').populate('user');
     }
 
-    async orderStatusUpdate(user: string, orderID: string, value: string,Total:number) {
+    async orderStatusUpdate(user: string, orderID: string, value: string,Total:number):Promise<order> {
       
         if(value==='return'){
         const data= await this._userModel.findByIdAndUpdate({_id:user},{$inc:{wallet:Total},$push: {

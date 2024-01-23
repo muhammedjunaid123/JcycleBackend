@@ -10,12 +10,13 @@ import { json } from 'stream/consumers';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { rentRepository } from 'src/repositories/base/rent.repository';
+import { servicerRepository } from 'src/repositories/base/servicers.repository';
 
 @Injectable()
 export class AdminService {
 constructor( private _adminRepository:AdminRepository,
  
-  private _userRepoository:UserRepository,private _productRepository:productRepository,private _rentReository:rentRepository){}
+  private _userRepoository:UserRepository,private _productRepository:productRepository,private _rentReository:rentRepository,private _servicerRepository:servicerRepository){}
 
   async SignIn(createAdminDto: CreateAdminDto,res:Response) {
   return await this._adminRepository.SignIn(createAdminDto,res)
@@ -62,5 +63,9 @@ constructor( private _adminRepository:AdminRepository,
   }
   rentBlock(id:string,isBlocked:boolean){
     return this._rentReository.rentBlock(id,isBlocked)
+  }
+  
+  serviceBlock(data:any){
+   return this._servicerRepository.serviceBlock(data)
   }
 }

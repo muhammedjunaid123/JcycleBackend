@@ -1,11 +1,11 @@
 import * as mongoose from 'mongoose';
 
-export const ratings_reviewSchema = new mongoose.Schema(
+export const Rentratings_reviewSchema = new mongoose.Schema(
     {
         user: { type: mongoose.Schema.ObjectId, ref: 'User' },
         product: {
             type: mongoose.Schema.ObjectId,
-            ref:'product',
+            ref:'rent',
         },
 
         ratings_review: [

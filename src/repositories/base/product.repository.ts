@@ -1,23 +1,25 @@
 import { Inject, HttpException, HttpStatus } from "@nestjs/common";
 import { CreateProductDto } from "../../product/dto/create-product.dto";
 import { UpdateProductDto } from "src/product/dto/update-product.dto";
-import { Product } from "../../product/entities/product.entity";
+import {  brand, category, product } from "../../product/entities/product.entity";
 import { Model } from "mongoose";
 import { Response } from "express";
+import { promises } from "dns";
+import { IProductRepository } from "../interfaces/product-repostiory.interface";
 
-export class productRepository {
+export class productRepository implements IProductRepository {
     constructor(
         @Inject('PRODUCT_MODEL')
-        private _productModel: Model<Product>,
+        private _productModel: Model<product>,
         @Inject('BRAND_MODEL')
-        private _brandModel: Model<Product>,
+        private _brandModel: Model<brand>,
         @Inject('CATRGORY_MODEL')
-        private _categoryModel: Model<Product>,
+        private _categoryModel: Model<category>,
         @Inject('REVIEW_MODEL')
         private _reviewModel: Model<any>
     ) { }
     //for create brand 
-    async createBrand(brandName: CreateProductDto) {
+    async createBrand(brandName: CreateProductDto):Promise<brand> {
         const { name } = brandName;
         if (name.trim() === '') {
             throw new HttpException(
@@ -45,7 +47,7 @@ export class productRepository {
         return await brand.save();
     }
     // create category 
-    async createCategory(categoryName: CreateProductDto) {
+    async createCategory(categoryName: CreateProductDto):Promise<category> {
         const { name } = categoryName
         if (name.trim() === '') {
             throw new HttpException(
@@ -70,7 +72,7 @@ export class productRepository {
     }
 
     // create the product 
-    async createProduct(productData: CreateProductDto, img: any, res: any) {
+    async createProduct(productData: CreateProductDto, img: any, res: any):Promise<product> {
         const image = []
         for (let f of img) {
             image.push(f.secure_url)
@@ -97,7 +99,7 @@ export class productRepository {
 
     }
     //update the product 
-    async productUpdate(id: string, UpdateProduct: UpdateProductDto, img: any,res:Response) {
+    async productUpdate(id: string, UpdateProduct: UpdateProductDto, img: any,res:Response):Promise<Response> {
         console.log('enter to repo');
 
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
@@ -151,7 +153,7 @@ export class productRepository {
         });
     }
     //update the brand
-    async brandUpdate(id: string, UpdateBrand: UpdateProductDto) {
+    async brandUpdate(id: string, UpdateBrand: UpdateProductDto):Promise<brand> {
         const { name } = UpdateBrand
         if (name.trim() === '') {
             throw new HttpException(
@@ -166,7 +168,7 @@ export class productRepository {
         })
     }
 
-    async categoryUpdate(id: string, Updatecategory: UpdateProductDto) {
+    async categoryUpdate(id: string, Updatecategory: UpdateProductDto):Promise<category> {
         const { name } = Updatecategory
         if (name.trim() === '') {
             throw new HttpException(
@@ -183,26 +185,27 @@ export class productRepository {
 
     }
 
-    async findAllBrand() {
+    async findAllBrand():Promise<brand[]> {
         return await this._brandModel.find()
     }
-    async findAllcategory() {
+    async findAllcategory():Promise<category[]> {
         return await this._categoryModel.find()
     }
-    async findAllProduct() {
+    async findAllProduct():Promise<product[]> {
         const data = await this._productModel.find({ isBlocked: false }).populate('brand')
+        let brandData:any
         const result = data.filter((res) => {
-            res = res['brand']
-            if (res['isBlocked'] === false) {
+          brandData= res['brand']
+            if (brandData['isBlocked'] === false) {
                 return res
             }
         })
         return result
     }
-    async ProductDetails(id: string) {
+    async ProductDetails(id: string):Promise<product> {
         return await this._productModel.findById({ _id: id }).populate('brand').populate('category')
     }
-    async findProductDetails(id: string) {
+    async findProductDetails(id: string):Promise<any> {
 
         const obj = {}
         let total = 0
@@ -232,41 +235,41 @@ export class productRepository {
         const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
         return { total, obj, product, Total }
     }
-    async findAllProductAdmin() {
+    async findAllProductAdmin():Promise<product[]> {
         return await this._productModel.find().populate('brand')
     }
 
-    async brandDetails(id: string) {
+    async brandDetails(id: string):Promise<brand> {
         return await this._brandModel.findById({ _id: id })
     }
     // to block or unblock the product
-    async productBlock_and_unblock(id: string, productData: UpdateProductDto) {
+    async productBlock_and_unblock(id: string, productData: UpdateProductDto):Promise<product> {
         const { isBlocked } = productData
         return await this._productModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
     }
 
     // to block or unblock the category
-    async categoryblock(id: string, productData: UpdateProductDto) {
+    async categoryblock(id: string, productData: UpdateProductDto):Promise<category> {
 
         const { isBlocked } = productData
         return await this._categoryModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
     }
 
     // to block or unblock the brand
-    async brandBlock(id: string, brandData: UpdateProductDto) {
+    async brandBlock(id: string, brandData: UpdateProductDto):Promise<brand> {
         console.log(brandData);
         const { isBlocked } = brandData
 
         return await this._brandModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
     }
-    async categoryDetails(id: string) {
+    async categoryDetails(id: string):Promise<category> {
         return await this._categoryModel.findById({ _id: id })
     }
 
-    async findBestSeller() {
+    async findBestSeller():Promise<product[]> {
         return await this._productModel.find().populate('brand').limit(12)
     }
-    async filter(filter: CreateProductDto) {
+    async filter(filter: CreateProductDto):Promise<product[]> {
         let obj = {}
         console.log(filter);
 
@@ -296,7 +299,7 @@ export class productRepository {
 
         return data
     }
-    async imgDelete(index:number,id:string){
+    async imgDelete(index:number,id:string):Promise<product>{
         console.log('enter the repo');
         
         await this._productModel.findByIdAndUpdate(

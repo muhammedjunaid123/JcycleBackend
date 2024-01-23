@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { addressProviders, cartProviders, locationProviders, orderProviders, rentOrderProviders, rentProviders, reviewProviders, usersProviders, wishlistProviders } from './users.providers';
+import { RENTreviewProviders, addressProviders, cartProviders, locationProviders, orderProviders, rentOrderProviders, rentProviders, reviewProviders, usersProviders, wishlistProviders } from './users.providers';
 import { DatabaseModule } from 'src/config/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -18,6 +18,8 @@ import { ImageService } from 'src/image/image.service';
 import { addressRepository } from 'src/repositories/base/address.repository';
 import { AuthModule } from 'src/auth/auth.module';
 import { locationRepository } from 'src/repositories/base/location.repository';
+import { servicerRepository } from 'src/repositories/base/servicers.repository';
+import { ServiceProviders, ServicerProviders,serviceOrderProviders } from 'src/servicer/servicer.providers';
 
 
 @Module({
@@ -29,14 +31,16 @@ import { locationRepository } from 'src/repositories/base/location.repository';
       secret: process.env.secret,
       signOptions: { expiresIn: '2 days' },
     }),
-    
+
   ],
   controllers: [UsersController],
   providers: [UsersService, ...usersProviders, JwtModule, UserRepository, cartRepository, wishlistRepository,
-     ...cartProviders, ...wishlistProviders, ...productProviders, ...brandProviders, ...categoryProviders,
-     orderRepository,...orderProviders,...reviewProviders,reviewRepository,...rentProviders,rentRepository,ImageService,...addressProviders,addressRepository,...rentOrderProviders,...locationProviders,locationRepository
+    ...cartProviders, ...wishlistProviders, ...productProviders, ...brandProviders, ...categoryProviders,
+    orderRepository, ...orderProviders, ...reviewProviders, reviewRepository, ...rentProviders, rentRepository, ImageService,
+    ...addressProviders, addressRepository, ...rentOrderProviders, ...locationProviders, locationRepository,...ServicerProviders,
+    servicerRepository,...ServiceProviders,...serviceOrderProviders,...RENTreviewProviders
   ],
-  exports: [UsersService,JwtModule],
+  exports: [UsersService, JwtModule],
 
 })
 export class UsersModule { }

@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as otpGenerator from 'otp-generator';
 import { MailerService } from '@nestjs-modules/mailer';
+import { jwtDecode } from 'jwt-decode';
 @Injectable()
 export class ServicerService {
     constructor(private _servicerRepository: servicerRepository,
@@ -20,12 +21,13 @@ export class ServicerService {
     }
     async login(data: any, res: Response) {
 
-        const servicerData = this._servicerRepository.login(data)
+
+        const servicerData = await this._servicerRepository.login(data)
 
         if (servicerData) {
 
             const user = await bcrypt.compare(data.password, servicerData['password'])
-            console.log(user);
+
 
             if (user) {
                 if (user.isVerified === false) {
@@ -131,6 +133,34 @@ export class ServicerService {
     }
     verified(id: string) {
         return this._servicerRepository.verified(id)
-    
+
+    }
+
+    addService(data: any, servicer: string) {
+        const servicerId = jwtDecode(servicer)
+        return this._servicerRepository.addService(data, servicerId['token'])
+    }
+    GetService() {
+        return this._servicerRepository.GetService()
+    }
+    blockService(id: string, isBlocked: boolean) {
+        return this._servicerRepository.blockService(id, isBlocked)
+    }
+    getServiceById(id: string) {
+        return this._servicerRepository.getServiceById(id)
+    }
+    editService(id:string,data:any) {
+        return this._servicerRepository.editService(id,data)
+    }
+    getUserserviceHistory(id:string){
+        const decoded = jwtDecode(id);
+        return this._servicerRepository.getUserserviceHistory(decoded['token'])
+      }
+      serviceOrderCancel(data:any){
+        return this._servicerRepository.serviceOrderCancel(data)
+      }
+      servicer(){
+        return this._servicerRepository.servicer()
       }
 }
+

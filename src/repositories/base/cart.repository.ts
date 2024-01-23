@@ -1,15 +1,17 @@
 import { HttpException, HttpStatus, Inject } from "@nestjs/common";
 import { Model } from "mongoose";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
+import { cart } from "src/users/entities/user.entity";
+import { ICartRepository } from "../interfaces/cart-repostiory.interface";
 
 
-export class cartRepository {
+export class cartRepository implements ICartRepository {
   constructor(
     @Inject('CART_MODEL')
-    private _cartModel: Model<any>,
+    private _cartModel: Model<cart>,
   ) { }
 
-  async cart(id: string) {
+  async cart(id: string):Promise<cart> {
 
     try {
       return this._cartModel.findOne({ user: id }).populate('product.id').populate('user')
@@ -19,7 +21,7 @@ export class cartRepository {
     }
   }
 
-  async addCart(id: string, user: string, price: number) {
+  async addCart(id: string, user: string, price: number):Promise<cart> {
 
 
     const exist = await this._cartModel.findOne({ user: user })
@@ -54,7 +56,7 @@ export class cartRepository {
       return await data.save()
     }
   }
-  async cartRemove(id: string, user: string, price: number, count: number) {
+  async cartRemove(id: string, user: string, price: number, count: number):Promise<cart> {
     const exist = await this._cartModel.findOne({ user: user })
     if (exist) {
       return await this._cartModel.findOneAndUpdate({ user: user }, { $pull: { product: { id: id } }, $inc: { TotalAmount: -price * count } })
@@ -62,7 +64,7 @@ export class cartRepository {
     }
   }
 
-  async cartUpdate(user: string, id: string, count: number, price: number) {
+  async cartUpdate(user: string, id: string, count: number, price: number):Promise<cart> {
 
     console.log(price);
 

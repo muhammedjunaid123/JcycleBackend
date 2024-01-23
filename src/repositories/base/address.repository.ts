@@ -1,8 +1,9 @@
 import { Inject } from "@nestjs/common";
 import { Model } from "mongoose";
 import { User, address } from "src/users/entities/user.entity";
+import { IAddressRepository } from "../interfaces/address-repository.interface";
 
-export class addressRepository {
+export class addressRepository implements IAddressRepository {
     constructor(
         @Inject('ADDRESS_MODEL')
         private _addressModel: Model<any>,
@@ -10,7 +11,7 @@ export class addressRepository {
         private _userModel: Model<User>,
 
     ) { }
-    async addAddress(user: string, addressData: address) {
+    async addAddress(user: string, addressData: address):Promise<address> {
         console.log(user);
         const { city, country, district, fname, housename, lname, mobile, pin, state, email } = addressData
 
@@ -55,7 +56,7 @@ export class addressRepository {
 
         }
     }
-   async Address(user:string){
+   async Address(user:string):Promise<address>{
      return await this._addressModel.findOne({user:user})
     }
 }

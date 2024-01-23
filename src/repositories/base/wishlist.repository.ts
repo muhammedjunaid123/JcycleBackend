@@ -1,19 +1,20 @@
 import { HttpException, HttpStatus, Inject } from "@nestjs/common";
 import { log } from "console";
 import { Model } from "mongoose";
-import { Product } from "src/product/entities/product.entity";
+import { product } from "src/product/entities/product.entity";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
-import { User } from "src/users/entities/user.entity";
+import { User, wishlist } from "src/users/entities/user.entity";
+import { IWishlistRepository } from "../interfaces/wishlist-repository.interface";
 
-export class wishlistRepository {
+export class wishlistRepository implements IWishlistRepository {
   constructor(
     @Inject('WISHLIST_MODEL')
-    private _wishlistModel: Model<any>,
+    private _wishlistModel: Model<wishlist>,
     @Inject('PRODUCT_MODEL')
-    private _productModel: Model<Product>,
+    private _productModel: Model<product>,
   ) { }
 
-  async addWishlist(id: string, user: string) {
+  async addWishlist(id: string, user: string):Promise<wishlist> {
     
     const exist = await this._wishlistModel.findOne({ user: user })
     if (exist) {
@@ -41,7 +42,7 @@ export class wishlistRepository {
     return await data.save()
   }
 
-  Wishlist(id:string){
+  Wishlist(id:string):Promise<wishlist>{
    
     try {
       return this._wishlistModel.findOne({user:id}).populate('product.id')

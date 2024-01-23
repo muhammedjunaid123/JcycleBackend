@@ -71,4 +71,8 @@ export class AdminController {
     
    return this.adminService.rentBlock(id,isBlocked)
   }
+  @Patch('serviceBlock')
+  serviceBlock(@Body() data:any){
+   return this.adminService.serviceBlock(data)
+  }
 }

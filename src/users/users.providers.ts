@@ -8,6 +8,8 @@ import { rentSchema } from 'src/schemas/rent.schema';
 import { addressSchema } from 'src/schemas/address.schema';
 import { rentOrderSchema } from 'src/schemas/rent-order.schema';
 import { locationSchema } from 'src/schemas/location.schema';
+import { serviceOrderSchema } from 'src/schemas/serviceOrder.schema';
+import { Rentratings_reviewSchema } from 'src/schemas/rent-review.schema';
 
 
 export const usersProviders = [
@@ -58,7 +60,14 @@ export const reviewProviders = [
     inject: ['DATABASE_CONNECTION'],
   },
 ]
-
+export const RENTreviewProviders = [
+  {
+    provide: 'RENTREVIEW_MODEL',
+    useFactory: (connection: Connection) =>
+      connection.model('Rentreview', Rentratings_reviewSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+]
 export const rentProviders = [
   {
     provide: 'RENT_MODEL',
@@ -95,3 +104,5 @@ export const locationProviders = [
     inject: ['DATABASE_CONNECTION'],
   }
 ]
+
+

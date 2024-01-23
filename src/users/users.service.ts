@@ -13,10 +13,11 @@ import { jwtDecode } from "jwt-decode";
 import { orderRepository } from 'src/repositories/base/order.repository';
 import { reviewRepository } from 'src/repositories/base/review.repository';
 import { ImageService } from 'src/image/image.service';
-import { address, rent, rentorderDetails } from './entities/user.entity';
+import { User, address, rent, rentorderDetails } from './entities/user.entity';
 import { rentRepository } from 'src/repositories/base/rent.repository';
 import { addressRepository } from 'src/repositories/base/address.repository';
 import { locationRepository } from 'src/repositories/base/location.repository';
+import { servicerRepository } from 'src/repositories/base/servicers.repository';
 
 @Injectable()
 export class UsersService {
@@ -30,7 +31,8 @@ export class UsersService {
     private _image: ImageService,
     private _rentRepository: rentRepository,
     private _addressRepository:addressRepository,
-    private _locationRepository:locationRepository
+    private _locationRepository:locationRepository,
+    private _servicerRepository:servicerRepository
   ) {
 
   }
@@ -44,7 +46,7 @@ export class UsersService {
 
   //service for user login 
   async signIn(createUserDto: CreateUserDto, res: Response) {
-    const userData = await this._UserRepository.SignIn(createUserDto, res);
+    const userData:User = await this._UserRepository.SignIn(createUserDto);
 
     if (userData) {
 
@@ -296,6 +298,38 @@ export class UsersService {
   changeStatusRent(data:any){
   
     return this._rentRepository.changeStatusRent(data)
+  }
+  getAllService(){
+    return this._servicerRepository.GetAllServiceUser()
+  }
+  addServiceOrder(data:any){
+         
+    const decoded = jwtDecode(data['user']);
+  
+   return this._servicerRepository.addServiceOrder(data,decoded['token'])
+  }
+  getUserserviceHistory(id:string){
+    const decoded = jwtDecode(id);
+    return this._servicerRepository.getUserserviceHistory(decoded['token'])
+  }
+  serviceOrderCancel(data:any){
+    return this._servicerRepository.serviceOrderCancel(data)
+  }
+ 
+  addrentReview(data: any) {
+    const { user, review, ratings, productID } = data
+    const decoded = jwtDecode(user);
+
+    if (review.trim() === '') {
+      throw new HttpException(
+        'review can be null',
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return this._reviewRepository.addrentReview(decoded['token'], review.trim(), ratings, productID)
+  }
+  rentReview(id: string) {
+    return this._reviewRepository.rentReview(id)
   }
 }
 

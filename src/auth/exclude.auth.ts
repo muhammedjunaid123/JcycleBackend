@@ -16,6 +16,7 @@ export const excluded = [
    '/users/loadRentBicycle',
     '/users/rentDetail',
     '/users/addlocation',
-    '/users/location'
+    '/users/location',
+    '/admin/servicer'
 
 ]
