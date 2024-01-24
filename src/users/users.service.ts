@@ -331,5 +331,22 @@ export class UsersService {
   rentReview(id: string) {
     return this._reviewRepository.rentReview(id)
   }
+  imgDelete(index:number,id:string){
+    console.log('enter 2');
+    
+    return this._rentRepository.imgDelete(index,id)
+  }
+async Editrent(rent_data: rent, files: Array<Express.Multer.File>,ProductId:string,res:Response) {
+  let image=[]
+  if(files!==undefined){
+       image = await this._image.upload(files);
+      console.log(image);    
+  }
+      await this._rentRepository.Editrent(image, rent_data,ProductId)
+      return res.status(HttpStatus.CREATED).json({
+  
+      });
+    }
+  
 }
 

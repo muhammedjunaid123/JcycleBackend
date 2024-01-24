@@ -1,7 +1,7 @@
 import { Inject, HttpException, HttpStatus } from "@nestjs/common";
 import { CreateProductDto } from "../../product/dto/create-product.dto";
 import { UpdateProductDto } from "src/product/dto/update-product.dto";
-import {  brand, category, product } from "../../product/entities/product.entity";
+import { brand, category, product } from "../../product/entities/product.entity";
 import { Model } from "mongoose";
 import { Response } from "express";
 import { promises } from "dns";
@@ -19,60 +19,73 @@ export class productRepository implements IProductRepository {
         private _reviewModel: Model<any>
     ) { }
     //for create brand 
-    async createBrand(brandName: CreateProductDto):Promise<brand> {
-        const { name } = brandName;
-        if (name.trim() === '') {
-            throw new HttpException(
-                'enter value!!!!',
-                HttpStatus.NOT_ACCEPTABLE
-            )
+    async createBrand(brandName: CreateProductDto): Promise<brand> {
+        try {
+
+            const { name } = brandName;
+            if (name.trim() === '') {
+                throw new HttpException(
+                    'enter value!!!!',
+                    HttpStatus.NOT_ACCEPTABLE
+                )
+            }
+            // Check if the brand with the given name already exists
+            const existingBrand = await this._brandModel.findOne({ Brand_name: name });
+
+            if (existingBrand) {
+                throw new HttpException(
+                    `Brand with name '${name}' already exists.`,
+                    HttpStatus.BAD_REQUEST,
+                );
+
+            }
+
+            // If the brand doesn't exist, create a new one
+            const brand = new this._brandModel({
+                Brand_name: name
+            });
+
+            // Save the new brand to the database
+            return await brand.save();
+        } catch (error) {
+
         }
-        // Check if the brand with the given name already exists
-        const existingBrand = await this._brandModel.findOne({ Brand_name: name });
-
-        if (existingBrand) {
-            throw new HttpException(
-                `Brand with name '${name}' already exists.`,
-                HttpStatus.BAD_REQUEST,
-            );
-
-        }
-
-        // If the brand doesn't exist, create a new one
-        const brand = new this._brandModel({
-            Brand_name: name
-        });
-
-        // Save the new brand to the database
-        return await brand.save();
     }
     // create category 
-    async createCategory(categoryName: CreateProductDto):Promise<category> {
-        const { name } = categoryName
-        if (name.trim() === '') {
-            throw new HttpException(
-                'enter value!!!!',
-                HttpStatus.NOT_ACCEPTABLE
-            )
+    async createCategory(categoryName: CreateProductDto): Promise<category> {
+        try {
+
+            const { name } = categoryName
+            if (name.trim() === '') {
+                throw new HttpException(
+                    'enter value!!!!',
+                    HttpStatus.NOT_ACCEPTABLE
+                )
+            }
+            const existingBrand = await this._categoryModel.findOne({ category_name: name });
+
+            if (existingBrand) {
+                throw new HttpException(
+                    `category with name '${name}' already exists.`,
+                    HttpStatus.BAD_REQUEST,
+                );
+
+            }
+
+            const category = new this._categoryModel({
+                category_name: name
+            })
+            return await category.save();
+        } catch (error) {
+
         }
-        const existingBrand = await this._categoryModel.findOne({ category_name: name });
-
-        if (existingBrand) {
-            throw new HttpException(
-                `category with name '${name}' already exists.`,
-                HttpStatus.BAD_REQUEST,
-            );
-
-        }
-
-        const category = new this._categoryModel({
-            category_name: name
-        })
-        return await category.save();
     }
 
     // create the product 
-    async createProduct(productData: CreateProductDto, img: any, res: any):Promise<product> {
+    async createProduct(productData: CreateProductDto, img: any, res: any): Promise<product> {
+        try {
+            
+        
         const image = []
         for (let f of img) {
             image.push(f.secure_url)
@@ -96,40 +109,45 @@ export class productRepository implements IProductRepository {
         return res.status(HttpStatus.CREATED).json({
 
         });
+    } catch (error) {
+            
+    }
 
     }
     //update the product 
-    async productUpdate(id: string, UpdateProduct: UpdateProductDto, img: any,res:Response):Promise<Response> {
+    async productUpdate(id: string, UpdateProduct: UpdateProductDto, img: any, res: Response): Promise<Response> {
+        try {
+            
         console.log('enter to repo');
 
         const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
         if (img.length === 0) {
-             await this._productModel.findByIdAndUpdate(
+            await this._productModel.findByIdAndUpdate(
                 { _id: id },
-                 {
+                {
                     $set: {
-                    name,
-                    brake_type,
-                    brand,
-                    category,
-                    cycle_Details,
-                    gears,
-                    price,
-                    stock,
-                    suspension,
+                        name,
+                        brake_type,
+                        brand,
+                        category,
+                        cycle_Details,
+                        gears,
+                        price,
+                        stock,
+                        suspension,
 
-                }
-            })
+                    }
+                })
             return res.status(HttpStatus.CREATED).json({
 
             });
         }
-      
+
 
 
         console.log('enter');
 
-         await this._productModel.findByIdAndUpdate(
+        await this._productModel.findByIdAndUpdate(
             { _id: id },
             {
                 $set: {
@@ -151,9 +169,14 @@ export class productRepository implements IProductRepository {
         return res.status(HttpStatus.CREATED).json({
 
         });
+    } catch (error) {
+            
+    }
     }
     //update the brand
-    async brandUpdate(id: string, UpdateBrand: UpdateProductDto):Promise<brand> {
+    async brandUpdate(id: string, UpdateBrand: UpdateProductDto): Promise<brand> {
+        try {
+        
         const { name } = UpdateBrand
         if (name.trim() === '') {
             throw new HttpException(
@@ -166,9 +189,14 @@ export class productRepository implements IProductRepository {
                 Brand_name: name
             }
         })
+    } catch (error) {
+            
+    }
     }
 
-    async categoryUpdate(id: string, Updatecategory: UpdateProductDto):Promise<category> {
+    async categoryUpdate(id: string, Updatecategory: UpdateProductDto): Promise<category> {
+        try {
+            
         const { name } = Updatecategory
         if (name.trim() === '') {
             throw new HttpException(
@@ -181,31 +209,33 @@ export class productRepository implements IProductRepository {
                 category_name: name
             }
         })
-
+    } catch (error) {
+            
+    }
 
     }
 
-    async findAllBrand():Promise<brand[]> {
+    async findAllBrand(): Promise<brand[]> {
         return await this._brandModel.find()
     }
-    async findAllcategory():Promise<category[]> {
+    async findAllcategory(): Promise<category[]> {
         return await this._categoryModel.find()
     }
-    async findAllProduct():Promise<product[]> {
+    async findAllProduct(): Promise<product[]> {
         const data = await this._productModel.find({ isBlocked: false }).populate('brand')
-        let brandData:any
+        let brandData: any
         const result = data.filter((res) => {
-          brandData= res['brand']
+            brandData = res['brand']
             if (brandData['isBlocked'] === false) {
                 return res
             }
         })
         return result
     }
-    async ProductDetails(id: string):Promise<product> {
+    async ProductDetails(id: string): Promise<product> {
         return await this._productModel.findById({ _id: id }).populate('brand').populate('category')
     }
-    async findProductDetails(id: string):Promise<any> {
+    async findProductDetails(id: string): Promise<any> {
 
         const obj = {}
         let total = 0
@@ -235,41 +265,41 @@ export class productRepository implements IProductRepository {
         const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
         return { total, obj, product, Total }
     }
-    async findAllProductAdmin():Promise<product[]> {
+    async findAllProductAdmin(): Promise<product[]> {
         return await this._productModel.find().populate('brand')
     }
 
-    async brandDetails(id: string):Promise<brand> {
+    async brandDetails(id: string): Promise<brand> {
         return await this._brandModel.findById({ _id: id })
     }
     // to block or unblock the product
-    async productBlock_and_unblock(id: string, productData: UpdateProductDto):Promise<product> {
+    async productBlock_and_unblock(id: string, productData: UpdateProductDto): Promise<product> {
         const { isBlocked } = productData
         return await this._productModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
     }
 
     // to block or unblock the category
-    async categoryblock(id: string, productData: UpdateProductDto):Promise<category> {
+    async categoryblock(id: string, productData: UpdateProductDto): Promise<category> {
 
         const { isBlocked } = productData
         return await this._categoryModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
     }
 
     // to block or unblock the brand
-    async brandBlock(id: string, brandData: UpdateProductDto):Promise<brand> {
+    async brandBlock(id: string, brandData: UpdateProductDto): Promise<brand> {
         console.log(brandData);
         const { isBlocked } = brandData
 
         return await this._brandModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
     }
-    async categoryDetails(id: string):Promise<category> {
+    async categoryDetails(id: string): Promise<category> {
         return await this._categoryModel.findById({ _id: id })
     }
 
-    async findBestSeller():Promise<product[]> {
+    async findBestSeller(): Promise<product[]> {
         return await this._productModel.find().populate('brand').limit(12)
     }
-    async filter(filter: CreateProductDto):Promise<product[]> {
+    async filter(filter: CreateProductDto): Promise<product[]> {
         let obj = {}
         console.log(filter);
 
@@ -299,9 +329,9 @@ export class productRepository implements IProductRepository {
 
         return data
     }
-    async imgDelete(index:number,id:string):Promise<product>{
+    async imgDelete(index: number, id: string): Promise<product> {
         console.log('enter the repo');
-        
+
         await this._productModel.findByIdAndUpdate(
             id,
             { $unset: { [`image.${index}`]: 1 } }

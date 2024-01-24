@@ -11,7 +11,7 @@ export class cartRepository implements ICartRepository {
     private _cartModel: Model<cart>,
   ) { }
 
-  async cart(id: string):Promise<cart> {
+  async cart(id: string): Promise<cart> {
 
     try {
       return this._cartModel.findOne({ user: id }).populate('product.id').populate('user')
@@ -21,53 +21,70 @@ export class cartRepository implements ICartRepository {
     }
   }
 
-  async addCart(id: string, user: string, price: number):Promise<cart> {
+  async addCart(id: string, user: string, price: number): Promise<cart> {
+
+    try {
 
 
-    const exist = await this._cartModel.findOne({ user: user })
-    if (exist) {
-      const existProduct = await this._cartModel.findOne({ user: user, 'product.id': id })
-      if (existProduct) {
-        throw new HttpException(
-          'already added',
-          HttpStatus.FOUND
-        )
+      const exist = await this._cartModel.findOne({ user: user })
+      if (exist) {
+        const existProduct = await this._cartModel.findOne({ user: user, 'product.id': id })
+        if (existProduct) {
+          throw new HttpException(
+            'already added',
+            HttpStatus.FOUND
+          )
+        } else {
+
+
+          return await this._cartModel.findOneAndUpdate({ user: user }, { $push: { product: { id: id, count: 1 } }, $inc: { TotalAmount: price } })
+        }
       } else {
-        
-        
-        return await this._cartModel.findOneAndUpdate({ user: user }, { $push: { product: { id: id, count: 1 } }, $inc: { TotalAmount: price } })
+
+
+
+        const data = new this._cartModel({
+          user: user,
+          product: [
+            {
+              id: id,
+              count: 1,
+            }
+          ],
+          TotalAmount: price
+        })
+
+
+        return await data.save()
       }
-    } else {
+    } catch (error) {
 
-
-
-      const data = new this._cartModel({
-        user: user,
-        product: [
-          {
-            id: id,
-            count: 1,
-          }
-        ],
-        TotalAmount: price
-      })
-      
-       
-      return await data.save()
     }
   }
-  async cartRemove(id: string, user: string, price: number, count: number):Promise<cart> {
-    const exist = await this._cartModel.findOne({ user: user })
-    if (exist) {
-      return await this._cartModel.findOneAndUpdate({ user: user }, { $pull: { product: { id: id } }, $inc: { TotalAmount: -price * count } })
+  async cartRemove(id: string, user: string, price: number, count: number): Promise<cart> {
+    try {
+
+
+      const exist = await this._cartModel.findOne({ user: user })
+      if (exist) {
+        return await this._cartModel.findOneAndUpdate({ user: user }, { $pull: { product: { id: id } }, $inc: { TotalAmount: -price * count } })
+
+      }
+    } catch (error) {
 
     }
   }
 
-  async cartUpdate(user: string, id: string, count: number, price: number):Promise<cart> {
+  async cartUpdate(user: string, id: string, count: number, price: number): Promise<cart> {
+    try {
 
-    console.log(price);
 
-    return await this._cartModel.findOneAndUpdate({ user: user, 'product.id': id }, { $set: { 'product.$.count': count }, $inc: { TotalAmount: price } })
+      console.log(price);
+
+      return await this._cartModel.findOneAndUpdate({ user: user, 'product.id': id }, { $set: { 'product.$.count': count }, $inc: { TotalAmount: price } })
+
+    } catch (error) {
+
+    }
   }
 }

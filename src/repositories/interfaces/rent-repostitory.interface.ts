@@ -3,7 +3,7 @@ import { rent, rentorderDetails } from "src/users/entities/user.entity";
 export interface IRentRepository {
     addrent(img: any, rent_data: rent, user: string): Promise<rent>;
     loadRentBicycle(data: any): Promise<rent[]>;
-    rentDetail(id: string): Promise<rent>;
+    rentDetail(id: string): Promise<any>;
     addrentOrder(orderDetails: rentorderDetails, userid: string): Promise<rentorderDetails>;
     rentHistory(id: string): Promise<rentorderDetails[]>;
     getUserRentProduct(id: string): Promise<rent[]>;

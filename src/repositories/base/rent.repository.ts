@@ -16,8 +16,10 @@ export class rentRepository implements IRentRepository {
     private _rentOrderModel: Model<any>,
     @Inject('USER_MODEL')
     private _userModel: Model<User>,
+    @Inject('RENTREVIEW_MODEL')
+    private _reviewRentModel: Model<any>
   ) { }
-  async addrent(img: any, rent_data: rent, user: string):Promise<rent> {
+  async addrent(img: any, rent_data: rent, user: string): Promise<rent> {
     try {
       const image = []
       for (let f of img) {
@@ -44,7 +46,7 @@ export class rentRepository implements IRentRepository {
     }
   }
 
-  async loadRentBicycle(data: any):Promise<rent[]> {
+  async loadRentBicycle(data: any): Promise<rent[]> {
     try {
 
       let { start, end, location } = data;
@@ -83,15 +85,15 @@ export class rentRepository implements IRentRepository {
                 }
               }
             ],
-            isBlocked:false,
-            adminisBlocked:false
+            isBlocked: false,
+            adminisBlocked: false
           }
         }
       ]);
-      
 
 
-    
+
+
 
       return dataa
 
@@ -99,10 +101,32 @@ export class rentRepository implements IRentRepository {
 
     }
   }
-  async rentDetail(id: string):Promise<rent> {
-    return this._rentModel.findById({ _id: id }).populate('owner')
+  async rentDetail(id: string): Promise<any> {
+    const obj = {}
+    let total = 0
+    let Total = 0
+    let data = await this._reviewRentModel.findOne({ product: id })
+    if (!data) {
+      const product = await this._rentModel.findById({ _id: id }).populate('owner')
+      return { total, obj, product, Total }
+    }
+    data = data['ratings_review']
+    data.forEach((res: any) => {
+
+      res = res['ratings']
+      total += res
+      if (!obj[res]) {
+        obj[res] = 1
+      } else {
+        obj[res] += 1
+      }
+    })
+    Total = total
+    total = total / data.length
+    const product = await this._rentModel.findById({ _id: id }).populate('owner')
+    return { total, obj, product, Total }
   }
-  async addrentOrder(orderDetails: rentorderDetails, userid: string):Promise<rentorderDetails> {
+  async addrentOrder(orderDetails: rentorderDetails, userid: string): Promise<rentorderDetails> {
     const { Date, owner, productID, totalAmount } = orderDetails
 
 
@@ -120,38 +144,76 @@ export class rentRepository implements IRentRepository {
 
 
   }
- async rentHistory(id:string):Promise<rentorderDetails[]>{
- return this._rentOrderModel.find({user:id}).populate('rentProduct').populate('owner').populate('user')
+  async rentHistory(id: string): Promise<rentorderDetails[]> {
+    return this._rentOrderModel.find({ user: id }).populate('rentProduct').populate('owner').populate('user')
   }
-  async getUserRentProduct(id:string):Promise<rent[]>{
-    return this._rentModel.find({owner:id}).populate('owner')
+  async getUserRentProduct(id: string): Promise<rent[]> {
+    return this._rentModel.find({ owner: id }).populate('owner')
   }
-  async blockRentProduct(productID:any):Promise<rent>{
-      const {id,isBlocked}=productID
-      if(isBlocked===false){
-        return this._rentModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:true}})
-      }else{
-        return this._rentModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:false}})
-      }
+  async blockRentProduct(productID: any): Promise<rent> {
+    const { id, isBlocked } = productID
+    if (isBlocked === false) {
+      return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: true } })
+    } else {
+      return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: false } })
+    }
   }
-  async changeStatusRent(data:any):Promise<rent>{
-   const {itemId,totalAmount,user}=data
-   const value= await this._userModel.findByIdAndUpdate({_id:user},{$inc:{wallet:totalAmount},$push: {
-    walletHistory: {
-      date: new Date(),
-      amount: totalAmount,
-      description: `Refunded for Rent cancelled- RentId : ${itemId}`,
-    },
-  },})
-  return this._rentOrderModel.findByIdAndUpdate({_id:itemId},{$set:{status:'cancelled'}})
+  async changeStatusRent(data: any): Promise<rent> {
+    const { itemId, totalAmount, user } = data
+    const value = await this._userModel.findByIdAndUpdate({ _id: user }, {
+      $inc: { wallet: totalAmount }, $push: {
+        walletHistory: {
+          date: new Date(),
+          amount: totalAmount,
+          description: `Refunded for Rent cancelled- RentId : ${itemId}`,
+        },
+      },
+    })
+    return this._rentOrderModel.findByIdAndUpdate({ _id: itemId }, { $set: { status: 'cancelled' } })
 
   }
- async getRentProduct():Promise<rent[]>{
-  return this._rentModel.find().populate('owner')
+  async getRentProduct(): Promise<rent[]> {
+    return this._rentModel.find().populate('owner')
   }
-  async rentBlock(id:string,isBlocked:boolean):Promise<rent>{
+  async rentBlock(id: string, isBlocked: boolean): Promise<rent> {
+
+    return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { adminisBlocked: !isBlocked } }, { upsert: true })
+  }
+  async imgDelete(index:number,id:string):Promise<rent>{
+    console.log('enter the repo');
+    
+    await this._rentModel.findByIdAndUpdate(
+        id,
+        { $unset: { [`image.${index}`]: 1 } }
+    );
+
+    const result = await this._rentModel.findByIdAndUpdate(
+        id,
+        { $pull: { "image": null } },
+        { new: true }
+    );
+    return result
+}
+async Editrent(img: any, rent_data: rent, user: string): Promise<rent> {
+  try {
+    const { name, cycle_Details, location, price } = rent_data
+    console.log(img);
+    
+    if (img.length === 0) {
+      return await this._rentModel.findByIdAndUpdate({_id:user},{$set:{name:name,cycle_Details:cycle_Details,location:location,price:price}})
+  }
+   return await this._rentModel.findByIdAndUpdate({_id:user},{$set:{name:name,cycle_Details:cycle_Details,location:location,price:price}, $push: {
+    image: { $each: img.map(f => f.secure_url) },
+},})
    
-    return this._rentModel.findByIdAndUpdate({_id:id},{$set:{adminisBlocked:!isBlocked}},{upsert:true})
+
+
+
+  } catch (error) {
+    throw new HttpException(
+      error.error,
+      HttpStatus.BAD_REQUEST
+    )
   }
- 
+}
 }

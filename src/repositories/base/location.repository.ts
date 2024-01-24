@@ -6,17 +6,27 @@ import { ILocationRepository } from "../interfaces/location-repostiory.interface
 
 export class locationRepository implements ILocationRepository {
     constructor(
-      @Inject('LOCATION_MODEL')
-      private _locationModel: Model<any>,
-      ) {}
-    async addLocation(datas:any):Promise<location>{
-        
-        const data=new this._locationModel({
-            city:datas['city']
-        })
-        return await data.save()
+        @Inject('LOCATION_MODEL')
+        private _locationModel: Model<any>,
+    ) { }
+    async addLocation(datas: any): Promise<location> {
+        try {
+
+
+            const data = new this._locationModel({
+                city: datas['city']
+            })
+            return await data.save()
+        } catch (error) {
+
+        }
     }
-    async location():Promise<location[]>{
-        return await this._locationModel.find()
+    async location(): Promise<location[]> {
+        try {
+
+            return await this._locationModel.find()
+        } catch (error) {
+
+        }
     }
-    }
+}

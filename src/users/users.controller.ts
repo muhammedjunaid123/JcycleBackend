@@ -195,4 +195,24 @@ export class UsersController {
   rentReview(@Query() id: string) {
     return this.usersService.rentReview(id)
   }
+  @Patch('RentimgDelete')
+  imgDelete(@Body('index') index:number,@Body('id') id:string){
+    console.log('enter1');
+    
+    return this.usersService.imgDelete(index,id)
+  }
+  @Patch('rentEdit')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]))
+  rent_Edit(
+    @Res() res: Response,
+    @Body() rent_data: any,
+    @Query('id') ProductId:string,
+    @UploadedFiles() files: Array<Express.Multer.File>) {
+      
+    files = files['image']
+    
+    
+    this.usersService.Editrent(rent_data, files,ProductId,res)
+
+  }
 }
