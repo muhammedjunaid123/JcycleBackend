@@ -20,6 +20,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { locationRepository } from 'src/repositories/base/location.repository';
 import { servicerRepository } from 'src/repositories/base/servicers.repository';
 import { ServiceProviders, ServicerProviders,serviceOrderProviders } from 'src/servicer/servicer.providers';
+import { chatProviders } from 'src/chat/chatProviders';
 
 
 @Module({
@@ -38,7 +39,7 @@ import { ServiceProviders, ServicerProviders,serviceOrderProviders } from 'src/s
     ...cartProviders, ...wishlistProviders, ...productProviders, ...brandProviders, ...categoryProviders,
     orderRepository, ...orderProviders, ...reviewProviders, reviewRepository, ...rentProviders, rentRepository, ImageService,
     ...addressProviders, addressRepository, ...rentOrderProviders, ...locationProviders, locationRepository,...ServicerProviders,
-    servicerRepository,...ServiceProviders,...serviceOrderProviders,...RENTreviewProviders
+    servicerRepository,...ServiceProviders,...serviceOrderProviders,...RENTreviewProviders,...chatProviders
   ],
   exports: [UsersService, JwtModule],
 

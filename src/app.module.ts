@@ -11,6 +11,8 @@ import { ImageModule } from './image/image.module';
 import { AuthService } from './auth/auth.service';
 import { excluded } from './auth/exclude.auth';
 import { ServicerModule } from './servicer/servicer.module';
+import { ChatModule } from './chat/chat.module';
+
 
 
 
@@ -42,9 +44,10 @@ import { ServicerModule } from './servicer/servicer.module';
       ProductModule,
       ImageModule,
       ServicerModule,
+      ChatModule,
   ]
 ,  controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

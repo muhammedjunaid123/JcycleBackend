@@ -149,18 +149,113 @@ export class ServicerService {
     getServiceById(id: string) {
         return this._servicerRepository.getServiceById(id)
     }
-    editService(id:string,data:any) {
-        return this._servicerRepository.editService(id,data)
+    editService(id: string, data: any) {
+        return this._servicerRepository.editService(id, data)
     }
-    getUserserviceHistory(id:string){
+    getUserserviceHistory(id: string) {
         const decoded = jwtDecode(id);
         return this._servicerRepository.getUserserviceHistory(decoded['token'])
-      }
-      serviceOrderCancel(data:any){
+    }
+    serviceOrderCancel(data: any) {
         return this._servicerRepository.serviceOrderCancel(data)
-      }
-      servicer(){
+    }
+    servicer() {
         return this._servicerRepository.servicer()
+    }
+    async getRecentUsers(res: Response, req: Request) {
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader.split(' ')[1];
+            const decoded = await this._jwtService.verify(token);
+            const servicerId = decoded.token;
+            const findConnection =
+                await this._servicerRepository.findConnection(servicerId);
+            if (!findConnection) {
+                return res.status(HttpStatus.OK).json({
+                    message: 'No users available.',
+                });
+            }
+            const userSenderTypes = findConnection.messages
+                .filter((message) => message.senderType === 'User')
+                .map((message) => ({
+                    name: message.sender.name,
+                    id: message.sender._id,
+                }));
+            const uniqueUserSenderTypes = [
+                ...new Set(userSenderTypes.map((obj) => JSON.stringify(obj))),
+            ].map((str) => JSON.parse(str as string));
+            return res.status(HttpStatus.OK).json({
+                message: 'Success',
+                uniqueUserSenderTypes,
+                servicerId,
+            });
+        } catch (error) {
+            if (error instanceof HttpException) {
+                return res.status(error.getStatus()).json({
+                    message: error.message,
+                });
+            } else {
+                return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                    message: 'Internal Server Error',
+                });
+            }
+        }
+    }
+    async getRecentChats(id: string, res: Response, req: Request) {
+        try {
+          const authHeader = req.headers['authorization'];
+          const token = authHeader.split(' ')[1];
+          const decoded = await this._jwtService.verify(token);
+          const servicerId = decoded.token;
+          const findConnection = await this._servicerRepository.recentChats(
+            servicerId,
+            id,
+          );
+          if (findConnection) {
+            return res.status(HttpStatus.OK).json({
+              message: findConnection,
+              servicerId: servicerId,
+              id: findConnection._id,
+            });
+          } else {
+            const newRoom = this._servicerRepository.createRoom(servicerId, id);
+            newRoom.then((data: any) => {
+              return res
+                .status(HttpStatus.ACCEPTED)
+                .json({ message: data, servicerId: servicerId, id: data._id });
+            });
+          }
+        } catch (error) {
+          if (error instanceof HttpException) {
+            return res.status(error.getStatus()).json({
+              message: error.message,
+            });
+          } else {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+              message: 'Internal Server Error',
+            });
+          }
+        }
+      }
+      async getMyDetails(res: Response, req: Request) {
+        try {
+          const authHeader = req.headers['authorization'];
+          const token = authHeader.split(' ')[1];
+          const decoded = await this._jwtService.verify(token);
+          const servicerId = decoded.token;
+          const details = await this._servicerRepository.servicerFindId(servicerId);
+          return res.status(HttpStatus.OK).json({ details });
+        } catch (error) {
+          if (error instanceof HttpException) {
+            return res.status(error.getStatus()).json({
+              message: error.message,
+            });
+          } else {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+              message: 'Internal Server Error',
+            });
+          }
+        }
       }
 }
 

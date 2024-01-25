@@ -30,23 +30,23 @@ export class UsersService {
     private _reviewRepository: reviewRepository,
     private _image: ImageService,
     private _rentRepository: rentRepository,
-    private _addressRepository:addressRepository,
-    private _locationRepository:locationRepository,
-    private _servicerRepository:servicerRepository
+    private _addressRepository: addressRepository,
+    private _locationRepository: locationRepository,
+    private _servicerRepository: servicerRepository
   ) {
 
   }
   //service for user registration
   async SignUp(createUserDto: CreateUserDto, res: Response) {
 
-   return await this._UserRepository.createUser(createUserDto)
-  
+    return await this._UserRepository.createUser(createUserDto)
+
 
   }
 
   //service for user login 
   async signIn(createUserDto: CreateUserDto, res: Response) {
-    const userData:User = await this._UserRepository.SignIn(createUserDto);
+    const userData: User = await this._UserRepository.SignIn(createUserDto);
 
     if (userData) {
 
@@ -67,9 +67,9 @@ export class UsersService {
           );
         }
         const payload = { token: userData._id, role: 'user' };
-        let token=    await this._jwtService.sign(payload)
+        let token = await this._jwtService.sign(payload)
         console.log(token);
-        
+
         return res.status(HttpStatus.CREATED).json({
           access_token: token,
           message: 'Success',
@@ -245,77 +245,77 @@ export class UsersService {
     const decoded = jwtDecode(user['id']);
     return this._UserRepository.updateName(decoded['token'], name)
   }
-  async addrent(rent_data: rent, files: Array<Express.Multer.File>,user:string,res:Response) {
+  async addrent(rent_data: rent, files: Array<Express.Multer.File>, user: string, res: Response) {
     const image = await this._image.upload(files);
-    console.log(image);    
+    console.log(image);
     const decoded = jwtDecode(user);
-    await this._rentRepository.addrent(image, rent_data,decoded['token'])
+    await this._rentRepository.addrent(image, rent_data, decoded['token'])
     return res.status(HttpStatus.CREATED).json({
 
     });
   }
-  loadRentBicycle(data:any){
+  loadRentBicycle(data: any) {
     return this._rentRepository.loadRentBicycle(data)
   }
-  addAddress(addressData:address,user:string){
+  addAddress(addressData: address, user: string) {
     console.log(user);
-    
+
     const decoded = jwtDecode(user);
-   return this._addressRepository.addAddress(decoded['token'],addressData)
+    return this._addressRepository.addAddress(decoded['token'], addressData)
   }
-  Address(user:string){
+  Address(user: string) {
     const decoded = jwtDecode(user);
     return this._addressRepository.Address(decoded['token'])
   }
-  rentDetail(id:string){
- return this._rentRepository.rentDetail(id)
+  rentDetail(id: string) {
+    return this._rentRepository.rentDetail(id)
   }
-  addrentOrder(orderDetails:rentorderDetails){
-    let{Date,owner,paymentMethod,razorId,user,productID,totalAmount}=orderDetails
+  addrentOrder(orderDetails: rentorderDetails) {
+    let { Date, owner, paymentMethod, razorId, user, productID, totalAmount } = orderDetails
     const decoded = jwtDecode(user);
-  
-    return this._rentRepository.addrentOrder(orderDetails,decoded['token'])
+
+    return this._rentRepository.addrentOrder(orderDetails, decoded['token'])
   }
 
-  addlocation(data:any ){
-  return this._locationRepository.addLocation(data)
+  addlocation(data: any) {
+    return this._locationRepository.addLocation(data)
   }
-  location(){
+  location() {
     return this._locationRepository.location()
   }
-  rentHistory(id:string){
+  rentHistory(id: string) {
     const decoded = jwtDecode(id);
     return this._rentRepository.rentHistory(decoded['token'])
   }
-  getUserRentProduct(id:string){
+  getUserRentProduct(id: string) {
     const decoded = jwtDecode(id);
     return this._rentRepository.getUserRentProduct(decoded['token'])
   }
-  blockRentProduct(productId:any){    
-   
+  blockRentProduct(productId: any) {
+
     return this._rentRepository.blockRentProduct(productId)
   }
-  changeStatusRent(data:any){
-  
+  changeStatusRent(data: any) {
+
     return this._rentRepository.changeStatusRent(data)
   }
-  getAllService(){
+  getAllService() {
     return this._servicerRepository.GetAllServiceUser()
   }
-  addServiceOrder(data:any){
-         
+  addServiceOrder(data: any) {
+
     const decoded = jwtDecode(data['user']);
-  
-   return this._servicerRepository.addServiceOrder(data,decoded['token'])
+
+    return this._servicerRepository.addServiceOrder(data, decoded['token'])
   }
-  getUserserviceHistory(id:string){
+  getUserserviceHistory(id: string) {
     const decoded = jwtDecode(id);
     return this._servicerRepository.getUserserviceHistory(decoded['token'])
   }
-  serviceOrderCancel(data:any){
+  serviceOrderCancel(data: any) {
     return this._servicerRepository.serviceOrderCancel(data)
   }
- 
+
   addrentReview(data: any) {
     const { user, review, ratings, productID } = data
     const decoded = jwtDecode(user);
@@ -331,22 +331,73 @@ export class UsersService {
   rentReview(id: string) {
     return this._reviewRepository.rentReview(id)
   }
-  imgDelete(index:number,id:string){
+  imgDelete(index: number, id: string) {
     console.log('enter 2');
-    
-    return this._rentRepository.imgDelete(index,id)
+
+    return this._rentRepository.imgDelete(index, id)
   }
-async Editrent(rent_data: rent, files: Array<Express.Multer.File>,ProductId:string,res:Response) {
-  let image=[]
-  if(files!==undefined){
-       image = await this._image.upload(files);
-      console.log(image);    
-  }
-      await this._rentRepository.Editrent(image, rent_data,ProductId)
-      return res.status(HttpStatus.CREATED).json({
-  
-      });
+  async Editrent(rent_data: rent, files: Array<Express.Multer.File>, ProductId: string, res: Response) {
+    let image = []
+    if (files !== undefined) {
+      image = await this._image.upload(files);
+      console.log(image);
     }
-  
+    await this._rentRepository.Editrent(image, rent_data, ProductId)
+    return res.status(HttpStatus.CREATED).json({
+
+    });
+  }
+  async getRecentChats(id: string, res: Response, req: Request) {
+    try {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader.split(' ')[1];
+      const decoded = await this._jwtService.verify(token);
+      const userId = decoded.token;
+      const findConnection = await this._UserRepository.findConnection(
+        userId,
+        id,
+      );
+      if (findConnection) {
+        return res
+          .status(HttpStatus.OK)
+          .json({ message: findConnection, userId: userId });
+      } else {
+        const newRoom = this._UserRepository.createRoom(userId, id);
+        newRoom.then((data: any) => {
+          return res
+            .status(HttpStatus.CREATED)
+            .json({ userId: userId, message: data });
+        });
+      }
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+        });
+      } else {
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message: 'Internal Server Error',
+        });
+      }
+    }
+  }
+  servicerDetails(id:string){
+     return this._servicerRepository.servicerFindId(id)
+  }
+  getAddress(id:string,user:string){
+    const decoded = jwtDecode(user);
+   return this._addressRepository.getAddress(id,decoded['token'])
+  }
+  updateAddress(id:string,data:address,user:string){
+    const decoded = jwtDecode(user);
+    return this._addressRepository.updateAddress(id,data,decoded['token'])
+  }
+  addressDelete(user:string,id:string){
+    const decoded = jwtDecode(user);
+    return this._addressRepository.addressDelete(decoded['token'],id)
+  }
+  getService(id:string){
+    return this._servicerRepository.getService(id)
+  }
 }
 

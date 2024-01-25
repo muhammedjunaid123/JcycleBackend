@@ -15,7 +15,9 @@ export class wishlistRepository implements IWishlistRepository {
   ) { }
 
   async addWishlist(id: string, user: string):Promise<wishlist> {
-    
+    try {
+      
+
     const exist = await this._wishlistModel.findOne({ user: user })
     if (exist) {
      const existProduct=await this._wishlistModel.findOne({ user: user,'product.id': id })
@@ -40,6 +42,12 @@ export class wishlistRepository implements IWishlistRepository {
       ]
     })
     return await data.save()
+  } catch (error) {
+    throw new HttpException(
+      'there is some issue please try again later',
+      HttpStatus.BAD_REQUEST
+     )  
+  }
   }
 
   Wishlist(id:string):Promise<wishlist>{
@@ -48,7 +56,10 @@ export class wishlistRepository implements IWishlistRepository {
       return this._wishlistModel.findOne({user:id}).populate('product.id')
     } catch (error) {
       console.log(error);
-      
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )  
     }
   }
 }

@@ -19,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
 import { locationRepository } from 'src/repositories/base/location.repository';
 import { ServiceProviders, ServicerProviders,serviceOrderProviders } from 'src/servicer/servicer.providers';
 import { servicerRepository } from 'src/repositories/base/servicers.repository';
+import { chatProviders } from 'src/chat/chatProviders';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { servicerRepository } from 'src/repositories/base/servicers.repository';
     ...cartProviders,...productProviders,...brandProviders,...categoryProviders,
     orderRepository,...orderProviders,...reviewProviders,reviewRepository,rentRepository,...rentProviders,ImageService,...addressProviders,addressRepository,
     ...rentOrderProviders,...locationProviders,locationRepository, servicerRepository,...ServicerProviders,...ServiceProviders,
-    ...serviceOrderProviders,...RENTreviewProviders
+    ...serviceOrderProviders,...RENTreviewProviders,...chatProviders
   ]
 })
 export class AuthModule { }

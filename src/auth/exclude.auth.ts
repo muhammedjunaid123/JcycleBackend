@@ -13,10 +13,15 @@ export const excluded = [
     '/product/BestSeller',
     '/product/filter',
     '/admin/SignIn',
-   '/users/loadRentBicycle',
+    '/users/loadRentBicycle',
     '/users/rentDetail',
     '/users/addlocation',
     '/users/location',
-    '/admin/servicer'
+    '/admin/servicer',
+    '/servicer/servicer',
+    '/servicer/login',
+    '/servicer/otpVerification',
+    '/servicer/verified',
+
 
 ]

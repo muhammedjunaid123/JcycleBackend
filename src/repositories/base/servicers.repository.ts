@@ -17,6 +17,8 @@ export class servicerRepository implements IServicerRepository {
         private _serviceOrderModel: Model<serviceOrder>,
         @Inject('USER_MODEL')
         private _userModel: Model<User>,
+        @Inject('CHAT_MODEL')
+        private _chatModel: Model<any>,
 
     ) { }
     async addservicer(data: servicer): Promise<servicer> {
@@ -76,7 +78,10 @@ export class servicerRepository implements IServicerRepository {
         try {
             return this._servicerModel.findById(id)
         } catch (error) {
-
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
         }
 
     }
@@ -84,7 +89,10 @@ export class servicerRepository implements IServicerRepository {
         try {
             return await this._servicerModel.findByIdAndUpdate({ _id: id }, { $set: { isVerified: true } })
         } catch (error) {
-
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
         }
 
     }
@@ -162,7 +170,6 @@ export class servicerRepository implements IServicerRepository {
             })
             return await result.save()
         } catch (error) {
-            console.log(error);
 
             throw new HttpException(
                 error,
@@ -173,148 +180,295 @@ export class servicerRepository implements IServicerRepository {
 
     }
     async GetService(): Promise<service[]> {
-        return await this._serviceModel.find().populate('owner')
+        try {
+
+            return await this._serviceModel.find().populate('owner')
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
     async GetAllServiceUser(): Promise<service[]> {
-        const result = await this._serviceModel.aggregate([
-            {
-                $lookup: {
-                    from: 'servicers',
-                    foreignField: '_id',
-                    localField: 'owner',
-                    as: 'ownerData'
+        try {
+
+            const result = await this._serviceModel.aggregate([
+                {
+                    $lookup: {
+                        from: 'servicers',
+                        foreignField: '_id',
+                        localField: 'owner',
+                        as: 'ownerData'
+                    }
+                },
+                {
+                    $match: {
+                        'ownerData.isBlocked': false,
+                        isBooked: false
+                    }
                 }
-            },
-            {
-                $match:{
-                    'ownerData.isBlocked':false
-                }
-            }
-            
-        ]);
-       
-        console.log(result,'result');
-        return result
-        
-    }
-    async blockService(id: string, isBlocked: boolean): Promise<service> {
-        return await this._serviceModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: !isBlocked } })
-    }
 
-    async getServiceById(id: string): Promise<service> {
-        return await this._serviceModel.findById({ _id: id })
-    }
-
-    async editService(id: string, data: any): Promise<service> {
-        const { name, price, date, time, location, service_Details } = data
-        function convertTo24HourFormat(time12Hour) {
-            const date = new Date(`January 1, 2022 ${time12Hour}`);
-            const options: any = { hour: "numeric", minute: "numeric", hour12: false };
-            return new Intl.DateTimeFormat("en-US", options).format(date);
-        }
-        function formatTime(time) {
-            const options: any = { hour: "numeric", minute: "numeric", hour12: true };
-            return new Intl.DateTimeFormat("en-US", options).format(time);
-        }
-        let dateFromat = new Date(date)
-        console.log(dateFromat);
-        const currentTime = time
-
-        // Convert the time to a Date object
-        const dateGet = new Date(`January 1, 2022 ${currentTime}`);
+            ]);
 
 
-
-        // Calculate the previous hour
-        const previousHour = new Date(dateGet.getTime() - 60 * 60 * 1000);
-        const formattedPreviousHour = formatTime(previousHour);
-
-        // Calculate the next hour
-        const nextHour = new Date(dateGet.getTime() + 60 * 60 * 1000);
-        const formattedNextHour = formatTime(nextHour);
-        let PtimeFormat = convertTo24HourFormat(formattedPreviousHour)
-        let NtimeFormat = convertTo24HourFormat(formattedNextHour)
-        let FtimeFormat = convertTo24HourFormat(time)
-
-        console.log("Current Time:", FtimeFormat);
-        console.log("Previous Hour:", PtimeFormat);
-        console.log("Next Hour:", NtimeFormat);
-
-
-        const exData = await this._serviceModel.aggregate([
-            {
-                $match: {
-                    $and: [
-                        { _id: { $ne: id } },
-                        { date: dateFromat },
-                        { time: { $gte: PtimeFormat } },
-                        { time: { $lte: NtimeFormat } }
-                    ]
-
-                }
-            }
-        ])
-        console.log(exData);
-
-        if (exData.length !== 0) {
+            return result
+        } catch (error) {
             throw new HttpException(
-                'the date and time already exist or you can only added service after 1 hour gap',
-                HttpStatus.BAD_REQUEST,
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
             )
         }
 
-        return await this._serviceModel.findByIdAndUpdate({ _id: id }, { $set: { name: name, price: price, date: date, time: FtimeFormat, location: location, service_Details: service_Details } })
+    }
+    async blockService(id: string, isBlocked: boolean): Promise<service> {
+        try {
+
+            return await this._serviceModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: !isBlocked } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+
+    async getServiceById(id: string): Promise<service> {
+        try {
+
+            return await this._serviceModel.findById({ _id: id })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+
+    async editService(id: string, data: any): Promise<service> {
+        try {
+
+            const { name, price, date, time, location, service_Details } = data
+            function convertTo24HourFormat(time12Hour) {
+                const date = new Date(`January 1, 2022 ${time12Hour}`);
+                const options: any = { hour: "numeric", minute: "numeric", hour12: false };
+                return new Intl.DateTimeFormat("en-US", options).format(date);
+            }
+            function formatTime(time) {
+                const options: any = { hour: "numeric", minute: "numeric", hour12: true };
+                return new Intl.DateTimeFormat("en-US", options).format(time);
+            }
+            let dateFromat = new Date(date)
+            console.log(dateFromat);
+            const currentTime = time
+
+            // Convert the time to a Date object
+            const dateGet = new Date(`January 1, 2022 ${currentTime}`);
+
+
+
+            // Calculate the previous hour
+            const previousHour = new Date(dateGet.getTime() - 60 * 60 * 1000);
+            const formattedPreviousHour = formatTime(previousHour);
+
+            // Calculate the next hour
+            const nextHour = new Date(dateGet.getTime() + 60 * 60 * 1000);
+            const formattedNextHour = formatTime(nextHour);
+            let PtimeFormat = convertTo24HourFormat(formattedPreviousHour)
+            let NtimeFormat = convertTo24HourFormat(formattedNextHour)
+            let FtimeFormat = convertTo24HourFormat(time)
+
+            console.log("Current Time:", FtimeFormat);
+            console.log("Previous Hour:", PtimeFormat);
+            console.log("Next Hour:", NtimeFormat);
+
+
+            const exData = await this._serviceModel.aggregate([
+                {
+                    $match: {
+                        $and: [
+                            { _id: { $ne: id } },
+                            { date: dateFromat },
+                            { time: { $gte: PtimeFormat } },
+                            { time: { $lte: NtimeFormat } }
+                        ]
+
+                    }
+                }
+            ])
+            console.log(exData);
+
+            if (exData.length !== 0) {
+                throw new HttpException(
+                    'the date and time already exist or you can only added service after 1 hour gap',
+                    HttpStatus.BAD_REQUEST,
+                )
+            }
+
+            return await this._serviceModel.findByIdAndUpdate({ _id: id }, { $set: { name: name, price: price, date: date, time: FtimeFormat, location: location, service_Details: service_Details } })
+        } catch (error) {
+            throw new HttpException(
+                error,
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
     async addServiceOrder(data: any, user: string): Promise<serviceOrder> {
 
-        const { date, time, owner, razorId, paymentMethod, productID, totalAmount } = data
+        try {
 
-        await this._serviceModel.findByIdAndUpdate({ _id: productID }, { $set: { isBooked: true } })
+            const { date, time, owner, razorId, paymentMethod, productID, totalAmount } = data
+           
+            let dataa = await this._serviceModel.findByIdAndUpdate({ _id: productID }, { $set: { isBooked: true } })
+            console.log(dataa, 'update');
 
-        const orderData = new this._serviceOrderModel({
-            user: user,
-            service: productID,
-            date: date,
-            time: time,
-            totalAmount: totalAmount,
-            owner: owner,
-            paymentMethod: paymentMethod
-        })
-        console.log(orderData);
 
-        return await orderData.save()
+            const orderData = new this._serviceOrderModel({
+                user: user,
+                service: productID,
+                date: date,
+                time: time,
+                totalAmount: totalAmount,
+                owner: owner,
+                paymentMethod: paymentMethod
+            })
+
+            return await orderData.save()
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
     async getUserserviceHistory(id: string): Promise<serviceOrder[]> {
+        try {
 
-        let a = await this._serviceOrderModel.find({ user: id }).populate('owner').populate('service').populate('user')
-        console.log(a)
-        return a
+            let a = await this._serviceOrderModel.find({ user: id }).populate('owner').populate('service').populate('user')
+            console.log(a)
+            return a
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
 
     }
 
     async serviceOrderCancel(data: any): Promise<serviceOrder> {
+        try {
 
-        const { itemId, userId, price } = data
-        await this._userModel.findByIdAndUpdate({ _id: userId }, {
-            $inc: { wallet: price }, $push: {
-                walletHistory: {
-                    date: new Date(),
-                    amount: price,
-                    description: `Refunded for service cancelled-serviceId : ${itemId}`,
-                }
-            },
-        })
-        return await this._serviceOrderModel.findOneAndUpdate({ _id: itemId }, { $set: { status: 'cancelled' } })
+
+            const { itemId, userId, price } = data
+            await this._userModel.findByIdAndUpdate({ _id: userId }, {
+                $inc: { wallet: price }, $push: {
+                    walletHistory: {
+                        date: new Date(),
+                        amount: price,
+                        description: `Refunded for service cancelled-serviceId : ${itemId}`,
+                    }
+                },
+            })
+            return await this._serviceOrderModel.findOneAndUpdate({ _id: itemId }, { $set: { status: 'cancelled' } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
 
     }
-    
-    async serviceBlock(data:any):Promise<servicer>{
-        const {id,bool}=data
-        return await  this._servicerModel.findByIdAndUpdate({_id:id},{$set:{isBlocked:bool}})
+
+    async serviceBlock(data: any): Promise<servicer> {
+        try {
+
+            const { id, bool } = data
+            return await this._servicerModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: bool } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
-    async servicer():Promise<servicer[]>{
-        return await this._servicerModel.find()
+    async servicer(): Promise<servicer[]> {
+        try {
+
+            return await this._servicerModel.find()
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+    async findConnection(servicerId: string): Promise<any> {
+        try {
+
+
+            return await this._chatModel
+                .findOne({
+                    users: { $in: [servicerId] },
+                })
+                .populate('messages.sender')
+                .populate('messages.receiver');
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+    async recentChats(servicerId: string, id: string): Promise<any> {
+        try {
+
+            return await this._chatModel
+                .findOne({
+                    users: { $all: [servicerId, id] },
+                })
+                .populate('messages.sender')
+                .populate('messages.receiver');
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+    createRoom(servicerId: string, id: string): Promise<any> {
+        try {
+
+            const newRoom = new this._chatModel({
+                users: [servicerId, id],
+            });
+            return newRoom.save();
+        } catch (error) {
+
+        }
+    }
+    async servicerFindId(id: string): Promise<servicer> {
+        try {
+
+            return await this._servicerModel.findById({ _id: id });
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+    async getService(id: string) {
+        try {
+            return await this._serviceModel.findById({ _id: id })
+
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 }

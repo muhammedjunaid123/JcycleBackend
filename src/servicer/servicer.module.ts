@@ -7,6 +7,7 @@ import { DatabaseModule } from 'src/config/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { usersProviders } from 'src/users/users.providers';
+import { chatProviders } from 'src/chat/chatProviders';
 
 @Module({
   imports:[DatabaseModule,
@@ -17,6 +18,7 @@ import { usersProviders } from 'src/users/users.providers';
       signOptions: { expiresIn: '2 days' },
     }),],
   controllers: [ServicerController],
-  providers: [ServicerService,servicerRepository,...ServicerProviders,JwtModule,...ServiceProviders,...serviceOrderProviders,...usersProviders],
+  providers: [ServicerService,servicerRepository,...ServicerProviders,JwtModule,...ServiceProviders,...serviceOrderProviders,
+    ...usersProviders,...chatProviders],
 })
 export class ServicerModule {}

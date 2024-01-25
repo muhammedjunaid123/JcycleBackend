@@ -9,6 +9,8 @@ export class UserRepository implements IUserRepository {
   constructor(
     @Inject('USER_MODEL')
     private _userModel: Model<User>,
+    @Inject('CHAT_MODEL')
+    private _chatModel: Model<any>,
 
   ) { }
   //createUser 
@@ -71,33 +73,128 @@ export class UserRepository implements IUserRepository {
   }
 
   async userFindId(userId: string): Promise<User> {
-    return await this._userModel.findOne({ _id: userId });
+    try {
+      
+      return await this._userModel.findOne({ _id: userId });
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )    
+    }
   }
 
   async findAlluser(): Promise<User[]> {
-    return await this._userModel.find()
+    try {
+      
+      return await this._userModel.find()
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )    
+    }
   }
   // to block or unblock the user
   async userBlock_and_unblock(id: string, userdata: UpdateUserDto): Promise<User> {
+    try {
+      
     const { isBlocked } = userdata
 
     return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+  } catch (error) {
+    throw new HttpException(
+      'there is some issue please try again later',
+      HttpStatus.BAD_REQUEST
+     )     
+  }
   }
 
   async userDetails(id: string): Promise<User> {
-    return await this._userModel.findById({ _id: id })
+    try {
+      
+      return await this._userModel.findById({ _id: id })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )  
+    }
   }
   async verified(id: string): Promise<User> {
-    return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isVerified: true } })
+    try {
+      
+      return await this._userModel.findByIdAndUpdate({ _id: id }, { $set: { isVerified: true } })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )    
+    }
   }
 
   async loadWallet(id: string): Promise<User> {
-    return await this._userModel.findById({ _id: id })
+    try {
+      
+      return await this._userModel.findById({ _id: id })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )  
+    }
   }
   async userData(user: string): Promise<User> {
-    return await this._userModel.findById({ _id: user })
+    try {
+      
+      return await this._userModel.findById({ _id: user })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )    
+    }
   }
   async updateName(user: string, name: string): Promise<User> {
-    return await this._userModel.findByIdAndUpdate({ _id: user }, { $set: { name: name['name'] } })
+    try {
+      
+      return await this._userModel.findByIdAndUpdate({ _id: user }, { $set: { name: name['name'] } })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )     
+    }
+  }
+  async findConnection(userId: string, id: string): Promise<any> {
+    try {
+      
+    return await this._chatModel
+      .findOne({
+        users: { $all: [userId, id] },
+      })
+      .populate('messages.sender')
+      .populate('messages.receiver');
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )  
+    }
+  }
+  async createRoom(userId: string, id: string): Promise<any> {
+    try {
+      
+  
+    const newRoom = new this._chatModel({
+      users: [userId, id],
+    });
+    return newRoom.save();
+  } catch (error) {
+    throw new HttpException(
+      'there is some issue please try again later',
+      HttpStatus.BAD_REQUEST
+     )     
+  }
   }
 }

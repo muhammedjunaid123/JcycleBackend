@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, Query, UseInterceptors, UploadedFiles, ValidationPipe, UsePipes } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, rentdto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +7,7 @@ import { log } from 'console';
 import { get } from 'http';
 import { address, rent, rentorderDetails } from './entities/user.entity';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import path from 'path';
 
 @Controller('users')
 export class UsersController {
@@ -214,5 +215,33 @@ export class UsersController {
     
     this.usersService.Editrent(rent_data, files,ProductId,res)
 
+  }
+  @Get('getRecentChats')
+  async getRecentChats(
+    @Query('id') id: string,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
+    return this.usersService.getRecentChats(id, res, req);
+  }
+  @Get('servicerDetails')
+  servicerDetails(@Query('id') id:string){
+    return this.usersService.servicerDetails(id)
+  }
+  @Get('getAddress')
+  getAddress(@Query('id') id:string,@Query('user') user:string){
+    return this.usersService.getAddress(id,user)
+  }
+  @Patch('updateAddress')
+  updateAddress(@Body('id') id:string,@Body('data') data:address,@Query('user') user:string){
+    return this.usersService.updateAddress(id,data,user)
+  }
+  @Patch('addressDelete')
+  addressDelete(@Body('user') user:string,@Body('id') id:string){
+     return this.usersService.addressDelete(user,id)
+  }
+  @Get('getService')
+  getService(@Query('id') id:string){
+    return this.usersService.getService(id)
   }
 }

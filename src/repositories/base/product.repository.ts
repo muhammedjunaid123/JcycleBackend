@@ -84,44 +84,69 @@ export class productRepository implements IProductRepository {
     // create the product 
     async createProduct(productData: CreateProductDto, img: any, res: any): Promise<product> {
         try {
-            
-        
-        const image = []
-        for (let f of img) {
-            image.push(f.secure_url)
+
+
+            const image = []
+            for (let f of img) {
+                image.push(f.secure_url)
+            }
+
+            const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = productData
+
+            const product = new this._productModel({
+                name: name,
+                brake_type: brake_type,
+                brand: brand,
+                category: category,
+                cycle_Details: cycle_Details,
+                gears: gears,
+                price: price,
+                stock: stock,
+                suspension: suspension,
+                image: image
+            })
+            await product.save();
+            return res.status(HttpStatus.CREATED).json({
+
+            });
+        } catch (error) {
+
         }
-
-        const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = productData
-
-        const product = new this._productModel({
-            name: name,
-            brake_type: brake_type,
-            brand: brand,
-            category: category,
-            cycle_Details: cycle_Details,
-            gears: gears,
-            price: price,
-            stock: stock,
-            suspension: suspension,
-            image: image
-        })
-        await product.save();
-        return res.status(HttpStatus.CREATED).json({
-
-        });
-    } catch (error) {
-            
-    }
 
     }
     //update the product 
     async productUpdate(id: string, UpdateProduct: UpdateProductDto, img: any, res: Response): Promise<Response> {
         try {
-            
-        console.log('enter to repo');
 
-        const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
-        if (img.length === 0) {
+            console.log('enter to repo');
+
+            const { name, brake_type, brand, category, cycle_Details, gears, price, stock, suspension } = UpdateProduct
+            if (img.length === 0) {
+                await this._productModel.findByIdAndUpdate(
+                    { _id: id },
+                    {
+                        $set: {
+                            name,
+                            brake_type,
+                            brand,
+                            category,
+                            cycle_Details,
+                            gears,
+                            price,
+                            stock,
+                            suspension,
+
+                        }
+                    })
+                return res.status(HttpStatus.CREATED).json({
+
+                });
+            }
+
+
+
+            console.log('enter');
+
             await this._productModel.findByIdAndUpdate(
                 { _id: id },
                 {
@@ -135,83 +160,58 @@ export class productRepository implements IProductRepository {
                         price,
                         stock,
                         suspension,
-
-                    }
-                })
+                    },
+                    $push: {
+                        image: { $each: img.map(f => f.secure_url) },
+                    },
+                },
+            );
             return res.status(HttpStatus.CREATED).json({
 
             });
+        } catch (error) {
+
         }
-
-
-
-        console.log('enter');
-
-        await this._productModel.findByIdAndUpdate(
-            { _id: id },
-            {
-                $set: {
-                    name,
-                    brake_type,
-                    brand,
-                    category,
-                    cycle_Details,
-                    gears,
-                    price,
-                    stock,
-                    suspension,
-                },
-                $push: {
-                    image: { $each: img.map(f => f.secure_url) },
-                },
-            },
-        );
-        return res.status(HttpStatus.CREATED).json({
-
-        });
-    } catch (error) {
-            
-    }
     }
     //update the brand
     async brandUpdate(id: string, UpdateBrand: UpdateProductDto): Promise<brand> {
         try {
-        
-        const { name } = UpdateBrand
-        if (name.trim() === '') {
-            throw new HttpException(
-                'enter value!!!!',
-                HttpStatus.NOT_ACCEPTABLE
-            )
-        }
-        return await this._brandModel.findByIdAndUpdate({ _id: id }, {
-            $set: {
-                Brand_name: name
+
+            const { name } = UpdateBrand
+            if (name.trim() === '') {
+                throw new HttpException(
+                    'enter value!!!!',
+                    HttpStatus.NOT_ACCEPTABLE
+                )
             }
-        })
-    } catch (error) {
-            
-    }
+            return await this._brandModel.findByIdAndUpdate({ _id: id }, {
+                $set: {
+                    Brand_name: name
+                }
+            })
+        } catch (error) {
+
+        }
     }
 
     async categoryUpdate(id: string, Updatecategory: UpdateProductDto): Promise<category> {
         try {
-            
-        const { name } = Updatecategory
-        if (name.trim() === '') {
-            throw new HttpException(
-                'enter value!!!!',
-                HttpStatus.NOT_ACCEPTABLE
-            )
-        }
-        return await this._categoryModel.findByIdAndUpdate({ _id: id }, {
-            $set: {
-                category_name: name
+
+            const { name } = Updatecategory
+            if (name.trim() === '') {
+                throw new HttpException(
+                    'enter value!!!!',
+                    HttpStatus.NOT_ACCEPTABLE
+                )
             }
-        })
-    } catch (error) {
-            
-    }
+            return await this._categoryModel.findByIdAndUpdate({ _id: id }, {
+                $set: {
+                    category_name: name
+                }
+            })
+        } catch (error) {
+
+        }
 
     }
 
@@ -233,115 +233,200 @@ export class productRepository implements IProductRepository {
         return result
     }
     async ProductDetails(id: string): Promise<product> {
-        return await this._productModel.findById({ _id: id }).populate('brand').populate('category')
+        try {
+
+            return await this._productModel.findById({ _id: id }).populate('brand').populate('category')
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
     async findProductDetails(id: string): Promise<any> {
+        try {
 
-        const obj = {}
-        let total = 0
-        let Total = 0
-        let data = await this._reviewModel.findOne({ product: id })
-        if (!data) {
+            const obj = {}
+            let total = 0
+            let Total = 0
+            let data = await this._reviewModel.findOne({ product: id })
+            if (!data) {
+                const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
+                return { total, obj, product, Total }
+            }
+            data = data['ratings_review']
+            data.forEach((res: any) => {
+
+                res = res['ratings']
+                total += res
+                if (!obj[res]) {
+                    obj[res] = 1
+                } else {
+                    obj[res] += 1
+                }
+            })
+            Total = total
+            total = total / data.length
+
+
+
+
             const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
             return { total, obj, product, Total }
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
         }
-        data = data['ratings_review']
-        data.forEach((res: any) => {
-
-            res = res['ratings']
-            total += res
-            if (!obj[res]) {
-                obj[res] = 1
-            } else {
-                obj[res] += 1
-            }
-        })
-        Total = total
-        total = total / data.length
-
-
-
-
-        const product = await this._productModel.findById({ _id: id }).populate('brand').populate('category')
-        return { total, obj, product, Total }
     }
     async findAllProductAdmin(): Promise<product[]> {
-        return await this._productModel.find().populate('brand')
+        try {
+
+            return await this._productModel.find().populate('brand')
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
     async brandDetails(id: string): Promise<brand> {
-        return await this._brandModel.findById({ _id: id })
+        try {
+
+            return await this._brandModel.findById({ _id: id })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
     // to block or unblock the product
     async productBlock_and_unblock(id: string, productData: UpdateProductDto): Promise<product> {
-        const { isBlocked } = productData
-        return await this._productModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+        try {
+
+            const { isBlocked } = productData
+            return await this._productModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
     // to block or unblock the category
     async categoryblock(id: string, productData: UpdateProductDto): Promise<category> {
+        try {
 
-        const { isBlocked } = productData
-        return await this._categoryModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+            const { isBlocked } = productData
+            return await this._categoryModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
     // to block or unblock the brand
     async brandBlock(id: string, brandData: UpdateProductDto): Promise<brand> {
-        console.log(brandData);
-        const { isBlocked } = brandData
+        try {
 
-        return await this._brandModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+            console.log(brandData);
+            const { isBlocked } = brandData
+
+            return await this._brandModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: isBlocked } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
     async categoryDetails(id: string): Promise<category> {
-        return await this._categoryModel.findById({ _id: id })
+        try {
+
+            return await this._categoryModel.findById({ _id: id })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
     async findBestSeller(): Promise<product[]> {
-        return await this._productModel.find().populate('brand').limit(12)
+        try {
+
+            return await this._productModel.find().populate('brand').limit(12)
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
     async filter(filter: CreateProductDto): Promise<product[]> {
-        let obj = {}
-        console.log(filter);
+        try {
 
-        const { brake_type, brand, category, suspension, gears } = filter
-        console.log(brake_type, 'break');
+            let obj = {}
+            console.log(filter);
 
-        if (brake_type == 'true' || brake_type == 'false') {
-            obj['brake_type'] = brake_type
-        }
-        if (suspension == 'true' || suspension == 'false') {
-            obj['suspension'] = suspension
-        }
-        if (gears == 'true' || gears == 'false') {
-            obj['gears'] = gears
-        }
-        if (brand !== '') {
-            obj['brand'] = brand
-        }
-        if (category !== '') {
-            obj['category'] = category
-        }
+            const { brake_type, brand, category, suspension, gears } = filter
+            console.log(brake_type, 'break');
 
-        console.log(obj, 'this is obj');
+            if (brake_type == 'true' || brake_type == 'false') {
+                obj['brake_type'] = brake_type
+            }
+            if (suspension == 'true' || suspension == 'false') {
+                obj['suspension'] = suspension
+            }
+            if (gears == 'true' || gears == 'false') {
+                obj['gears'] = gears
+            }
+            if (brand !== '') {
+                obj['brand'] = brand
+            }
+            if (category !== '') {
+                obj['category'] = category
+            }
 
-        const data = await this._productModel.find(obj).populate('brand')
-        console.log(data);
+            console.log(obj, 'this is obj');
 
-        return data
+            const data = await this._productModel.find(obj).populate('brand')
+            console.log(data);
+
+            return data
+        } catch (error) {
+
+        }
     }
     async imgDelete(index: number, id: string): Promise<product> {
-        console.log('enter the repo');
 
-        await this._productModel.findByIdAndUpdate(
-            id,
-            { $unset: { [`image.${index}`]: 1 } }
-        );
+        try {
 
-        const result = await this._productModel.findByIdAndUpdate(
-            id,
-            { $pull: { "image": null } },
-            { new: true }
-        );
-        return result
+
+            await this._productModel.findByIdAndUpdate(
+                id,
+                { $unset: { [`image.${index}`]: 1 } }
+            );
+
+            const result = await this._productModel.findByIdAndUpdate(
+                id,
+                { $pull: { "image": null } },
+                { new: true }
+            );
+            return result
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+               )
+        }
+
     }
+
 }

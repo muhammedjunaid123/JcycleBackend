@@ -16,8 +16,11 @@ export class cartRepository implements ICartRepository {
     try {
       return this._cartModel.findOne({ user: id }).populate('product.id').populate('user')
     } catch (error) {
-      console.log(error);
 
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
     }
   }
 
@@ -58,7 +61,10 @@ export class cartRepository implements ICartRepository {
         return await data.save()
       }
     } catch (error) {
-
+      throw new HttpException(
+        error,
+        HttpStatus.BAD_REQUEST
+      )
     }
   }
   async cartRemove(id: string, user: string, price: number, count: number): Promise<cart> {
@@ -71,7 +77,10 @@ export class cartRepository implements ICartRepository {
 
       }
     } catch (error) {
-
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )
     }
   }
 
@@ -84,7 +93,10 @@ export class cartRepository implements ICartRepository {
       return await this._cartModel.findOneAndUpdate({ user: user, 'product.id': id }, { $set: { 'product.$.count': count }, $inc: { TotalAmount: price } })
 
     } catch (error) {
-
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )
     }
   }
 }

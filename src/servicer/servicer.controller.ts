@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import { ServicerService } from './servicer.service';
 import { Response, query } from 'express';
 
@@ -53,5 +53,21 @@ export class ServicerController {
   @Get('servciers')
   servicer(){
     return this._servicerService.servicer()
+  }
+  @Get('getRecentUsers')
+  async getRecentUsers(@Req() req: Request, @Res() res: Response) {
+    return this._servicerService.getRecentUsers(res, req);
+  }
+  @Get('getRecentChats')
+  async getRecentChats(
+    @Query('id') id: string,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
+    return this._servicerService.getRecentChats(id, res, req);
+  }
+  @Get('getMyDetails')
+  async getMyDetails(@Res() res: Response, @Req() req: Request) {
+    return this._servicerService.getMyDetails(res, req);
   }
 }

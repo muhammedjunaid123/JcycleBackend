@@ -1,4 +1,4 @@
-import { Inject } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject } from "@nestjs/common";
 import { Model } from "mongoose";
 import { User, order } from "src/users/entities/user.entity";
 import { IOrderRepository } from "../interfaces/order-repostiory.interface";
@@ -37,7 +37,10 @@ export class orderRepository implements IOrderRepository {
 
             return data1
         } catch (error) {
-
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+               )
         }
     }
     async loadOrder(user: string): Promise<order[]> {
@@ -46,7 +49,10 @@ export class orderRepository implements IOrderRepository {
 
             return await this._orderModel.find().populate('product.id').populate('user');
         } catch (error) {
-
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+               )
         }
     }
 
@@ -85,7 +91,10 @@ export class orderRepository implements IOrderRepository {
 
             return await this._orderModel.findOneAndUpdate({ user: user, 'product._id': orderID }, { $set: { 'product.$.status': value } })
         } catch (error) {
-
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+               )
         }
     }
 

@@ -40,7 +40,7 @@ export class rentRepository implements IRentRepository {
 
     } catch (error) {
       throw new HttpException(
-        error.error,
+        'there is some issue please try again later',
         HttpStatus.BAD_REQUEST
       )
     }
@@ -98,122 +98,191 @@ export class rentRepository implements IRentRepository {
       return dataa
 
     } catch (error) {
-
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
     }
   }
   async rentDetail(id: string): Promise<any> {
-    const obj = {}
-    let total = 0
-    let Total = 0
-    let data = await this._reviewRentModel.findOne({ product: id })
-    if (!data) {
+    try {
+
+      const obj = {}
+      let total = 0
+      let Total = 0
+      let data = await this._reviewRentModel.findOne({ product: id })
+      if (!data) {
+        const product = await this._rentModel.findById({ _id: id }).populate('owner')
+        return { total, obj, product, Total }
+      }
+      data = data['ratings_review']
+      data.forEach((res: any) => {
+
+        res = res['ratings']
+        total += res
+        if (!obj[res]) {
+          obj[res] = 1
+        } else {
+          obj[res] += 1
+        }
+      })
+      Total = total
+      total = total / data.length
       const product = await this._rentModel.findById({ _id: id }).populate('owner')
       return { total, obj, product, Total }
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
     }
-    data = data['ratings_review']
-    data.forEach((res: any) => {
-
-      res = res['ratings']
-      total += res
-      if (!obj[res]) {
-        obj[res] = 1
-      } else {
-        obj[res] += 1
-      }
-    })
-    Total = total
-    total = total / data.length
-    const product = await this._rentModel.findById({ _id: id }).populate('owner')
-    return { total, obj, product, Total }
   }
   async addrentOrder(orderDetails: rentorderDetails, userid: string): Promise<rentorderDetails> {
-    const { Date, owner, productID, totalAmount } = orderDetails
+    try {
 
+      const { Date, owner, productID, totalAmount } = orderDetails
+      const data = new this._rentOrderModel({
+        user: userid,
+        rentProduct: productID,
+        start: Date.start,
+        end: Date.end,
+        owner: owner,
+        totalAmount: totalAmount
+      })
+      return await data.save()
 
-
-
-    const data = new this._rentOrderModel({
-      user: userid,
-      rentProduct: productID,
-      start: Date.start,
-      end: Date.end,
-      owner: owner,
-      totalAmount: totalAmount
-    })
-    return await data.save()
-
-
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
+    }
   }
   async rentHistory(id: string): Promise<rentorderDetails[]> {
-    return this._rentOrderModel.find({ user: id }).populate('rentProduct').populate('owner').populate('user')
+    try {
+
+      return this._rentOrderModel.find({ user: id }).populate('rentProduct').populate('owner').populate('user')
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
+    }
   }
   async getUserRentProduct(id: string): Promise<rent[]> {
-    return this._rentModel.find({ owner: id }).populate('owner')
+    try {
+
+      return this._rentModel.find({ owner: id }).populate('owner')
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
+    }
   }
   async blockRentProduct(productID: any): Promise<rent> {
-    const { id, isBlocked } = productID
-    if (isBlocked === false) {
-      return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: true } })
-    } else {
-      return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: false } })
+    try {
+
+
+      const { id, isBlocked } = productID
+      if (isBlocked === false) {
+        return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: true } })
+      } else {
+        return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: false } })
+      }
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
     }
   }
   async changeStatusRent(data: any): Promise<rent> {
-    const { itemId, totalAmount, user } = data
-    const value = await this._userModel.findByIdAndUpdate({ _id: user }, {
-      $inc: { wallet: totalAmount }, $push: {
-        walletHistory: {
-          date: new Date(),
-          amount: totalAmount,
-          description: `Refunded for Rent cancelled- RentId : ${itemId}`,
+    try {
+      const { itemId, totalAmount, user } = data
+      const value = await this._userModel.findByIdAndUpdate({ _id: user }, {
+        $inc: { wallet: totalAmount }, $push: {
+          walletHistory: {
+            date: new Date(),
+            amount: totalAmount,
+            description: `Refunded for Rent cancelled- RentId : ${itemId}`,
+          },
         },
-      },
-    })
-    return this._rentOrderModel.findByIdAndUpdate({ _id: itemId }, { $set: { status: 'cancelled' } })
-
+      })
+      return this._rentOrderModel.findByIdAndUpdate({ _id: itemId }, { $set: { status: 'cancelled' } })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
+    }
   }
   async getRentProduct(): Promise<rent[]> {
-    return this._rentModel.find().populate('owner')
+    try {
+
+      return this._rentModel.find().populate('owner')
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
+    }
   }
   async rentBlock(id: string, isBlocked: boolean): Promise<rent> {
-
-    return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { adminisBlocked: !isBlocked } }, { upsert: true })
+    try {
+      
+      return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { adminisBlocked: !isBlocked } }, { upsert: true })
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )  
+    }
   }
-  async imgDelete(index:number,id:string):Promise<rent>{
-    console.log('enter the repo');
+  async imgDelete(index: number, id: string): Promise<rent> {
+
+    try {
     
     await this._rentModel.findByIdAndUpdate(
-        id,
-        { $unset: { [`image.${index}`]: 1 } }
+      id,
+      { $unset: { [`image.${index}`]: 1 } }
     );
 
     const result = await this._rentModel.findByIdAndUpdate(
-        id,
-        { $pull: { "image": null } },
-        { new: true }
+      id,
+      { $pull: { "image": null } },
+      { new: true }
     );
     return result
-}
-async Editrent(img: any, rent_data: rent, user: string): Promise<rent> {
-  try {
-    const { name, cycle_Details, location, price } = rent_data
-    console.log(img);
-    
-    if (img.length === 0) {
-      return await this._rentModel.findByIdAndUpdate({_id:user},{$set:{name:name,cycle_Details:cycle_Details,location:location,price:price}})
-  }
-   return await this._rentModel.findByIdAndUpdate({_id:user},{$set:{name:name,cycle_Details:cycle_Details,location:location,price:price}, $push: {
-    image: { $each: img.map(f => f.secure_url) },
-},})
-   
-
-
-
   } catch (error) {
     throw new HttpException(
-      error.error,
+      'there is some issue please try again later',
       HttpStatus.BAD_REQUEST
-    )
+     )   
   }
-}
+  }
+  async Editrent(img: any, rent_data: rent, user: string): Promise<rent> {
+    try {
+      const { name, cycle_Details, location, price } = rent_data
+      console.log(img);
+
+      if (img.length === 0) {
+        return await this._rentModel.findByIdAndUpdate({ _id: user }, { $set: { name: name, cycle_Details: cycle_Details, location: location, price: price } })
+      }
+      return await this._rentModel.findByIdAndUpdate({ _id: user }, {
+        $set: { name: name, cycle_Details: cycle_Details, location: location, price: price }, $push: {
+          image: { $each: img.map(f => f.secure_url) },
+        },
+      })
+
+
+
+
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+       )
+    }
+  }
 }

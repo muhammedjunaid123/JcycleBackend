@@ -14,6 +14,7 @@ import { reviewRepository } from 'src/repositories/base/review.repository';
 import { rentRepository } from 'src/repositories/base/rent.repository';
 import { servicerRepository } from 'src/repositories/base/servicers.repository';
 import { ServiceProviders, ServicerProviders, serviceOrderProviders } from 'src/servicer/servicer.providers';
+import { chatProviders } from 'src/chat/chatProviders';
 
 @Module({
   imports: [
@@ -25,7 +26,10 @@ import { ServiceProviders, ServicerProviders, serviceOrderProviders } from 'src/
       signOptions: { expiresIn: '2 days' },
     })],
   controllers: [AdminController],
-  providers: [AdminService, ...adminProviders, AdminRepository, JwtModule, productRepository, UserRepository, ...usersProviders, ...productProviders, ...brandProviders, ...categoryProviders, ...reviewProviders, reviewRepository, rentRepository, ...rentProviders, ...rentOrderProviders,servicerRepository,...ServicerProviders,...ServiceProviders,...serviceOrderProviders,...RENTreviewProviders],
+  providers: [AdminService, ...adminProviders, AdminRepository, JwtModule, productRepository, UserRepository,
+     ...usersProviders, ...productProviders, ...brandProviders, ...categoryProviders, ...reviewProviders,
+      reviewRepository, rentRepository, ...rentProviders, ...rentOrderProviders, servicerRepository,
+       ...ServicerProviders, ...ServiceProviders, ...serviceOrderProviders, ...RENTreviewProviders,...chatProviders],
   exports: [AdminService]
 })
 export class AdminModule { }
