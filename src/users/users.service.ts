@@ -203,10 +203,10 @@ export class UsersService {
 
     return this._cartRepository.cartUpdate(decoded['token'], id, count, price)
   }
-  addOrder(data: any) {
-    const { user, razorId, paymentMethod } = data
+  addOrder(data: any) { 
+    const { user, razorId, paymentMethod,location } = data   
     const decoded = jwtDecode(user);
-    return this._orderRepository.addOrder(decoded['token'], razorId, paymentMethod)
+    return this._orderRepository.addOrder(decoded['token'],razorId,paymentMethod,location)
   }
   loadOrder(id: string) {
     const decoded = jwtDecode(id['id']);
@@ -271,7 +271,7 @@ export class UsersService {
     return this._rentRepository.rentDetail(id)
   }
   addrentOrder(orderDetails: rentorderDetails) {
-    let { Date, owner, paymentMethod, razorId, user, productID, totalAmount } = orderDetails
+    let {paymentMethod, user } = orderDetails
     const decoded = jwtDecode(user);
 
     return this._rentRepository.addrentOrder(orderDetails, decoded['token'])

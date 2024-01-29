@@ -192,6 +192,8 @@ export class servicerRepository implements IServicerRepository {
     }
     async GetAllServiceUser(): Promise<service[]> {
         try {
+            let today = new Date()
+            console.log(today);
 
             const result = await this._serviceModel.aggregate([
                 {
@@ -205,7 +207,9 @@ export class servicerRepository implements IServicerRepository {
                 {
                     $match: {
                         'ownerData.isBlocked': false,
-                        isBooked: false
+                        isBooked: false,
+                        date: { $gte: today }
+
                     }
                 }
 
@@ -319,10 +323,20 @@ export class servicerRepository implements IServicerRepository {
         try {
 
             const { date, time, owner, razorId, paymentMethod, productID, totalAmount } = data
-           
+
             let dataa = await this._serviceModel.findByIdAndUpdate({ _id: productID }, { $set: { isBooked: true } })
             console.log(dataa, 'update');
-
+            if (paymentMethod === 'wallet') {
+                await this._userModel.findByIdAndUpdate({ _id: user }, {
+                  $inc: { wallet: -totalAmount }, $push: {
+                    walletHistory: {
+                      date: new Date(),
+                      amount: -totalAmount,
+                      description: ` wallet payment - Order ${productID}`,
+                    },
+                  },
+                })
+              }
 
             const orderData = new this._serviceOrderModel({
                 user: user,

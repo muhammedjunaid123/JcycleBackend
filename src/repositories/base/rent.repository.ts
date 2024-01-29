@@ -139,19 +139,35 @@ export class rentRepository implements IRentRepository {
   }
   async addrentOrder(orderDetails: rentorderDetails, userid: string): Promise<rentorderDetails> {
     try {
+      console.log(orderDetails);
 
-      const { Date, owner, productID, totalAmount } = orderDetails
+      const { date, owner, productID, totalAmount, paymentMethod } = orderDetails
+      console.log(date);
+
+      if (paymentMethod === 'wallet') {
+        await this._userModel.findByIdAndUpdate({ _id: userid }, {
+          $inc: { wallet: -totalAmount }, $push: {
+            walletHistory: {
+              date: new Date(),
+              amount: -totalAmount,
+              description: ` wallet payment - Order ${productID}`,
+            },
+          },
+        })
+      }
       const data = new this._rentOrderModel({
         user: userid,
         rentProduct: productID,
-        start: Date.start,
-        end: Date.end,
+        start: date.start,
+        end: date.end,
         owner: owner,
         totalAmount: totalAmount
       })
       return await data.save()
 
     } catch (error) {
+      console.log(error);
+
       throw new HttpException(
         'there is some issue please try again later',
         HttpStatus.BAD_REQUEST
@@ -230,36 +246,36 @@ export class rentRepository implements IRentRepository {
   }
   async rentBlock(id: string, isBlocked: boolean): Promise<rent> {
     try {
-      
+
       return this._rentModel.findByIdAndUpdate({ _id: id }, { $set: { adminisBlocked: !isBlocked } }, { upsert: true })
     } catch (error) {
       throw new HttpException(
         'there is some issue please try again later',
         HttpStatus.BAD_REQUEST
-       )  
+      )
     }
   }
   async imgDelete(index: number, id: string): Promise<rent> {
 
     try {
-    
-    await this._rentModel.findByIdAndUpdate(
-      id,
-      { $unset: { [`image.${index}`]: 1 } }
-    );
 
-    const result = await this._rentModel.findByIdAndUpdate(
-      id,
-      { $pull: { "image": null } },
-      { new: true }
-    );
-    return result
-  } catch (error) {
-    throw new HttpException(
-      'there is some issue please try again later',
-      HttpStatus.BAD_REQUEST
-     )   
-  }
+      await this._rentModel.findByIdAndUpdate(
+        id,
+        { $unset: { [`image.${index}`]: 1 } }
+      );
+
+      const result = await this._rentModel.findByIdAndUpdate(
+        id,
+        { $pull: { "image": null } },
+        { new: true }
+      );
+      return result
+    } catch (error) {
+      throw new HttpException(
+        'there is some issue please try again later',
+        HttpStatus.BAD_REQUEST
+      )
+    }
   }
   async Editrent(img: any, rent_data: rent, user: string): Promise<rent> {
     try {
@@ -282,7 +298,7 @@ export class rentRepository implements IRentRepository {
       throw new HttpException(
         'there is some issue please try again later',
         HttpStatus.BAD_REQUEST
-       )
+      )
     }
   }
 }

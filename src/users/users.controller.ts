@@ -74,7 +74,7 @@ export class UsersController {
 
   @Post('cheakout')
   addOrder(@Body() data: any) {
-
+  
     return this.usersService.addOrder(data)
   }
   @Get('order')

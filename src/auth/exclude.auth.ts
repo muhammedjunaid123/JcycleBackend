@@ -22,6 +22,7 @@ export const excluded = [
     '/servicer/login',
     '/servicer/otpVerification',
     '/servicer/verified',
+    '/users/getAllService'  
 
 
 ]

@@ -73,7 +73,7 @@ export interface rent {
 }
 export interface rentorderDetails {
   user: any,
-  Date: any,
+  date: any,
   owner: any,
   razorId: any,
   paymentMethod: string,
