@@ -268,5 +268,8 @@ export class ServicerService {
         const decode=jwtDecode(id)
         return this._servicerRepository.ServicerData(decode['token'])
        }
+       serviceFilter(time:string,date:Date,location:string){
+        return this._servicerRepository.serviceFilter(time,date,location)
+       }
 }
 

@@ -158,11 +158,18 @@ export class servicerRepository implements IServicerRepository {
                     HttpStatus.BAD_REQUEST,
                 )
             }
+            dateFromat.setUTCHours(0);
+            dateFromat.setUTCMinutes(0);
+            dateFromat.setUTCSeconds(0);
+            dateFromat.setUTCMilliseconds(0);
+
+            // Convert the modified Date object back to a string
+            dateFromat.setDate(dateFromat.getDate() + 1)
 
             const result = new this._serviceModel({
                 name: name,
                 price: price,
-                date: date,
+                date: dateFromat,
                 time: FtimeFormat,
                 location: location,
                 service_Details: service_Details,
@@ -170,6 +177,7 @@ export class servicerRepository implements IServicerRepository {
             })
             return await result.save()
         } catch (error) {
+            console.log(error);
 
             throw new HttpException(
                 error,
@@ -193,7 +201,11 @@ export class servicerRepository implements IServicerRepository {
     async GetAllServiceUser(): Promise<service[]> {
         try {
             let today = new Date()
-            console.log(today);
+            today.setUTCHours(0);
+            today.setUTCMinutes(0);
+            today.setUTCSeconds(0);
+            today.setUTCMilliseconds(0);
+
 
             const result = await this._serviceModel.aggregate([
                 {
@@ -201,12 +213,19 @@ export class servicerRepository implements IServicerRepository {
                         from: 'servicers',
                         foreignField: '_id',
                         localField: 'owner',
-                        as: 'ownerData'
+                        as: 'owner'
+                    }
+                },
+                {
+                    $addFields: {
+                        ownerData: {
+                            $first: '$owner'
+                        }
                     }
                 },
                 {
                     $match: {
-                        'ownerData.isBlocked': false,
+                        'owner.isBlocked': false,
                         isBooked: false,
                         date: { $gte: today }
 
@@ -215,9 +234,12 @@ export class servicerRepository implements IServicerRepository {
 
             ]);
 
-
+            console.log(result,'resssss');
+            
             return result
         } catch (error) {
+           
+            
             throw new HttpException(
                 'there is some issue please try again later',
                 HttpStatus.BAD_REQUEST
@@ -307,9 +329,12 @@ export class servicerRepository implements IServicerRepository {
                     'the date and time already exist or you can only added service after 1 hour gap',
                     HttpStatus.BAD_REQUEST,
                 )
-            }
-
-            return await this._serviceModel.findByIdAndUpdate({ _id: id }, { $set: { name: name, price: price, date: date, time: FtimeFormat, location: location, service_Details: service_Details } })
+            } dateFromat.setUTCHours(0);
+            dateFromat.setUTCMinutes(0);
+            dateFromat.setUTCSeconds(0);
+            dateFromat.setUTCMilliseconds(0);
+            dateFromat.setDate(dateFromat.getDate() + 1)
+            return await this._serviceModel.findByIdAndUpdate({ _id: id }, { $set: { name: name, price: price, date: dateFromat, time: FtimeFormat, location: location, service_Details: service_Details } })
         } catch (error) {
             throw new HttpException(
                 error,
@@ -486,13 +511,67 @@ export class servicerRepository implements IServicerRepository {
         }
     }
     async updateName(servicerId: string, name: string) {
+        try {
 
-        let resName = name['name']
-        console.log(resName);
 
-        return this._servicerModel.findByIdAndUpdate({ _id: servicerId }, { $set: { name: resName } })
+
+            let resName = name['name']
+            console.log(resName);
+
+            return this._servicerModel.findByIdAndUpdate({ _id: servicerId }, { $set: { name: resName } })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
     async ServicerData(id: string) {
-        return this._servicerModel.findById({ _id: id })
+        try {
+
+            return this._servicerModel.findById({ _id: id })
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+    async serviceFilter(time: string, date: any, location: string) {
+        try {
+
+
+            function convertTo24HourFormat(time12Hour) {
+                const date = new Date(`January 1, 2022 ${time12Hour}`);
+                const options: any = { hour: "numeric", minute: "numeric", hour12: false };
+                return new Intl.DateTimeFormat("en-US", options).format(date);
+            }
+            let obj = {}
+            if (time !== '') {
+                let resTime = convertTo24HourFormat(time)
+                obj['time'] = resTime
+            }
+            if (date !== '') {
+
+                let resDate = new Date(date)
+
+                obj['date'] = resDate
+            }
+            if (location !== '') {
+                obj['location'] = location
+            }
+
+            console.log(obj, 'obj');
+            let res = await this._serviceModel.find(obj).populate('owner')
+            console.log(res, 'res');
+
+            return res
+
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 }

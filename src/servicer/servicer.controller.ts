@@ -78,4 +78,8 @@ export class ServicerController {
   ServicerData(@Query('id') id:string,@Body('name') name:string){
     return this._servicerService.ServicerData(id)
   }
+  @Get('serviceFilter')
+  serviceFilter(@Query('time') time:string,@Query('date') date:Date,@Query('location') location:string){
+    return this._servicerService.serviceFilter(time,date,location)
+  }
 }
