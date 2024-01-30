@@ -70,4 +70,12 @@ export class ServicerController {
   async getMyDetails(@Res() res: Response, @Req() req: Request) {
     return this._servicerService.getMyDetails(res, req);
   }
+  @Post('updateName')
+  updateName(@Query() servcier: string, @Body() name: string) {
+    return this._servicerService.updateName(servcier, name)
+  }
+  @Get('ServicerData')
+  ServicerData(@Query('id') id:string,@Body('name') name:string){
+    return this._servicerService.ServicerData(id)
+  }
 }

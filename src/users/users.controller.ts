@@ -108,8 +108,6 @@ export class UsersController {
   }
   @Post('updateName')
   updateName(@Query() user: string, @Body() name: string) {
-
-
     return this.usersService.updateName(user, name)
   }
 

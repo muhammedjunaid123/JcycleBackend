@@ -244,6 +244,8 @@ export class ServicerService {
           const decoded = await this._jwtService.verify(token);
           const servicerId = decoded.token;
           const details = await this._servicerRepository.servicerFindId(servicerId);
+          console.log(details);
+          
           return res.status(HttpStatus.OK).json({ details });
         } catch (error) {
           if (error instanceof HttpException) {
@@ -257,5 +259,14 @@ export class ServicerService {
           }
         }
       }
+       updateName(servicerId:string,name:string){
+          
+        const decode=jwtDecode(servicerId['id'])
+       return  this._servicerRepository.updateName(decode['token'],name)
+       }
+       ServicerData(id:string){
+        const decode=jwtDecode(id)
+        return this._servicerRepository.ServicerData(decode['token'])
+       }
 }
 

@@ -328,15 +328,15 @@ export class servicerRepository implements IServicerRepository {
             console.log(dataa, 'update');
             if (paymentMethod === 'wallet') {
                 await this._userModel.findByIdAndUpdate({ _id: user }, {
-                  $inc: { wallet: -totalAmount }, $push: {
-                    walletHistory: {
-                      date: new Date(),
-                      amount: -totalAmount,
-                      description: ` wallet payment - Order ${productID}`,
+                    $inc: { wallet: -totalAmount }, $push: {
+                        walletHistory: {
+                            date: new Date(),
+                            amount: -totalAmount,
+                            description: ` wallet payment - Order ${productID}`,
+                        },
                     },
-                  },
                 })
-              }
+            }
 
             const orderData = new this._serviceOrderModel({
                 user: user,
@@ -484,5 +484,15 @@ export class servicerRepository implements IServicerRepository {
                 HttpStatus.BAD_REQUEST
             )
         }
+    }
+    async updateName(servicerId: string, name: string) {
+
+        let resName = name['name']
+        console.log(resName);
+
+        return this._servicerModel.findByIdAndUpdate({ _id: servicerId }, { $set: { name: resName } })
+    }
+    async ServicerData(id: string) {
+        return this._servicerModel.findById({ _id: id })
     }
 }
