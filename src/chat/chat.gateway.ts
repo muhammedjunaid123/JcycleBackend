@@ -14,8 +14,8 @@ dotenv.config();
 @WebSocketGateway({
   cors: {
     origin:  process.env.url,
-    methods: 'POST, GET, OPTIONS, PUT, DELETE, PATCH',
-    allowedHeaders: 'Content-Type, X-Auth-Token, Origin, Authorization',
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'X-Auth-Token', 'Origin', 'Authorization'],
 
   },
  
