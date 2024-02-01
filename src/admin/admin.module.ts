@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { productRepository } from 'src/repositories/base/product.repository';
 import { UserRepository } from 'src/repositories/base/user.repository';
-import { RENTreviewProviders, rentOrderProviders, rentProviders, reviewProviders, usersProviders } from 'src/users/users.providers';
+import { RENTreviewProviders, orderProviders, rentOrderProviders, rentProviders, reviewProviders, usersProviders } from 'src/users/users.providers';
 import { brandProviders, categoryProviders, productProviders } from 'src/product/product.providers';
 import { reviewRepository } from 'src/repositories/base/review.repository';
 import { rentRepository } from 'src/repositories/base/rent.repository';
@@ -29,7 +29,8 @@ import { chatProviders } from 'src/chat/chatProviders';
   providers: [AdminService, ...adminProviders, AdminRepository, JwtModule, productRepository, UserRepository,
      ...usersProviders, ...productProviders, ...brandProviders, ...categoryProviders, ...reviewProviders,
       reviewRepository, rentRepository, ...rentProviders, ...rentOrderProviders, servicerRepository,
-       ...ServicerProviders, ...ServiceProviders, ...serviceOrderProviders, ...RENTreviewProviders,...chatProviders],
+       ...ServicerProviders, ...ServiceProviders, ...serviceOrderProviders, ...RENTreviewProviders,...chatProviders,
+      ...orderProviders],
   exports: [AdminService]
 })
 export class AdminModule { }

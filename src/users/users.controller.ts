@@ -242,4 +242,5 @@ export class UsersController {
   getService(@Query('id') id:string){
     return this.usersService.getService(id)
   }
+ 
 }

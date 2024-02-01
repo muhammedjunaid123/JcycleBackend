@@ -271,5 +271,9 @@ export class ServicerService {
        serviceFilter(time:string,date:Date,location:string){
         return this._servicerRepository.serviceFilter(time,date,location)
        }
+       dashboard(id:string){
+        const decode=jwtDecode(id)
+        return this._servicerRepository.dashboard(decode['token'])
+       }
 }
 

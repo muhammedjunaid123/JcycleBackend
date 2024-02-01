@@ -68,4 +68,10 @@ constructor( private _adminRepository:AdminRepository,
   serviceBlock(data:any){
    return this._servicerRepository.serviceBlock(data)
   }
+  dashboard(){
+    return this._adminRepository.dashboard()
+  }
+  orders(){
+    return this._adminRepository.orders()
+  }
 }

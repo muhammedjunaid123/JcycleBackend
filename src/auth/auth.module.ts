@@ -31,7 +31,7 @@ import { chatProviders } from 'src/chat/chatProviders';
     ...cartProviders,...productProviders,...brandProviders,...categoryProviders,
     orderRepository,...orderProviders,...reviewProviders,reviewRepository,rentRepository,...rentProviders,ImageService,...addressProviders,addressRepository,
     ...rentOrderProviders,...locationProviders,locationRepository, servicerRepository,...ServicerProviders,...ServiceProviders,
-    ...serviceOrderProviders,...RENTreviewProviders,...chatProviders
+    ...serviceOrderProviders,...RENTreviewProviders,...chatProviders,
   ]
 })
 export class AuthModule { }

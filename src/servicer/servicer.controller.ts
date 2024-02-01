@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import { ServicerService } from './servicer.service';
 import { Response, query } from 'express';
+import { get } from 'http';
 
 @Controller('servicer')
 export class ServicerController {
@@ -81,5 +82,9 @@ export class ServicerController {
   @Get('serviceFilter')
   serviceFilter(@Query('time') time:string,@Query('date') date:Date,@Query('location') location:string){
     return this._servicerService.serviceFilter(time,date,location)
+  }
+  @Get('dashboard')
+  dashboard(@Query('id') id:string){
+    return this._servicerService.dashboard(id)
   }
 }
