@@ -13,7 +13,9 @@ import { ChatService } from './chat.service';
 dotenv.config();
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:4200',
+    origin:  process.env.url,
+    methods: 'POST, GET, OPTIONS, PUT, DELETE, PATCH',
+    allowedHeaders: 'Content-Type, X-Auth-Token, Origin, Authorization',
 
   },
  
