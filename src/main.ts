@@ -6,15 +6,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const corsOptions: CorsOptions = {
-    origin:process.env.url,
+    origin: process.env.url,
     credentials: true,
-  };  
-  app.enableCors({
-    origin:process.env.url,
-    credentials: true,
-  });
-  
+  };
+  app.enableCors(corsOptions);
+
   await app.listen(3000);
 
-} 
+}
 bootstrap();
