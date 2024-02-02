@@ -549,6 +549,7 @@ export class servicerRepository implements IServicerRepository {
             today.setUTCSeconds(0);
             today.setUTCMilliseconds(0);
             let obj = {}
+            obj={isBooked:false}
             if (time !== '') {
                 let resTime = convertTo24HourFormat(time)
                 obj['time'] = resTime
