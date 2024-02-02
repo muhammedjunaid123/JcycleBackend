@@ -543,7 +543,8 @@ export class servicerRepository implements IServicerRepository {
                 const date = new Date(`January 1, 2022 ${time12Hour}`);
                 const options: any = { hour: "numeric", minute: "numeric", hour12: false };
                 return new Intl.DateTimeFormat("en-US", options).format(date);
-            }  let today = new Date()
+            }
+              let today = new Date()
             today.setUTCHours(0);
             today.setUTCMinutes(0);
             today.setUTCSeconds(0);
@@ -566,7 +567,11 @@ export class servicerRepository implements IServicerRepository {
 
             console.log(obj, 'obj');
             if(date==''){
+                console.log(today);
+                
                 obj={date: {$gte: today}}
+                console.log(obj);
+                
                return await this._serviceModel.find(obj).populate('owner')
             }else{
                 return await this._serviceModel.find(obj).populate('owner')
