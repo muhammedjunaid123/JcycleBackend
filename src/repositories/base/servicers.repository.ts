@@ -565,8 +565,8 @@ export class servicerRepository implements IServicerRepository {
 
             console.log(obj, 'obj');
             if(date==''){
-
-               return await this._serviceModel.find(obj,{date: { $gte: today }}).populate('owner')
+                obj={date: {$gte: today}}
+               return await this._serviceModel.find(obj).populate('owner')
             }else{
                 return await this._serviceModel.find(obj).populate('owner')
             }
