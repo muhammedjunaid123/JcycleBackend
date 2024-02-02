@@ -569,7 +569,7 @@ export class servicerRepository implements IServicerRepository {
             if(date==''){
                 console.log(today);
                 
-                obj={date: {$gte: today}}
+                obj['date']={$gte: today}
                 console.log(obj);
                 
                return await this._serviceModel.find(obj).populate('owner')
