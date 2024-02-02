@@ -543,7 +543,11 @@ export class servicerRepository implements IServicerRepository {
                 const date = new Date(`January 1, 2022 ${time12Hour}`);
                 const options: any = { hour: "numeric", minute: "numeric", hour12: false };
                 return new Intl.DateTimeFormat("en-US", options).format(date);
-            }
+            }  let today = new Date()
+            today.setUTCHours(0);
+            today.setUTCMinutes(0);
+            today.setUTCSeconds(0);
+            today.setUTCMilliseconds(0);
             let obj = {}
             if (time !== '') {
                 let resTime = convertTo24HourFormat(time)
@@ -560,10 +564,15 @@ export class servicerRepository implements IServicerRepository {
             }
 
             console.log(obj, 'obj');
-            let res = await this._serviceModel.find(obj).populate('owner')
-            console.log(res, 'res');
+            if(date==''){
 
-            return res
+               return await this._serviceModel.find(obj,{date: { $gte: today }}).populate('owner')
+            }else{
+                return await this._serviceModel.find(obj).populate('owner')
+            }
+           
+
+          
 
         } catch (error) {
             throw new HttpException(
@@ -574,55 +583,55 @@ export class servicerRepository implements IServicerRepository {
     }
     async dashboard(id: string) {
         try {
-            
-     
-        const today = new Date()
-        console.log(today);
 
-        const revenue = await this._serviceOrderModel.aggregate([
-            {
-                $match: {
-                    date: { $lte: today },
-                    status: 'pending'
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    revenue: {
-                        $sum: "$totalAmount"
+
+            const today = new Date()
+            console.log(today);
+
+            const revenue = await this._serviceOrderModel.aggregate([
+                {
+                    $match: {
+                        date: { $lte: today },
+                        status: 'pending'
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        revenue: {
+                            $sum: "$totalAmount"
+                        }
                     }
                 }
-            }
-        ])
-        const service = await this._serviceModel.find({ owner: id }).countDocuments()
-        const done = await this._serviceModel.find({ owner: id, isBooked: true }).countDocuments()
-        const pending = await this._serviceModel.find({ owner: id, isBooked: false }).countDocuments()
-        const locationorder = await this._serviceModel.aggregate([
-            {
-                $match: {
-                    isBooked: true
-                }
-            }, {
-                $group: {
-                    _id: "$location",
-                    count: {
-                        $sum: 1
+            ])
+            const service = await this._serviceModel.find({ owner: id }).countDocuments()
+            const done = await this._serviceModel.find({ owner: id, isBooked: true }).countDocuments()
+            const pending = await this._serviceModel.find({ owner: id, isBooked: false }).countDocuments()
+            const locationorder = await this._serviceModel.aggregate([
+                {
+                    $match: {
+                        isBooked: true
+                    }
+                }, {
+                    $group: {
+                        _id: "$location",
+                        count: {
+                            $sum: 1
+                        }
                     }
                 }
-            }
 
-        ])
+            ])
 
-        console.log(revenue, service, done, pending, locationorder);
+            console.log(revenue, service, done, pending, locationorder);
 
-        return { revenue, service, done, pending, locationorder }
-    } catch (error) {
-        throw new HttpException(
-            'there is some issue please try again later',
-            HttpStatus.BAD_REQUEST
-        )
-    }
+            return { revenue, service, done, pending, locationorder }
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
 
