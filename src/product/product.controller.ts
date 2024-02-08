@@ -47,8 +47,8 @@ export class ProductController {
   }
   //to get all product
   @Get()
-  findAllProduct() {
-    return this.productService.findAllProduct();
+  findAllProduct(@Query('id') id:string) {
+    return this.productService.findAllProduct(id);
   }
   //to get all productDetails
   @Get('productDetail')

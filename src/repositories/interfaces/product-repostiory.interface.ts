@@ -12,7 +12,7 @@ export interface IProductRepository {
     categoryUpdate(id: string, Updatecategory: UpdateProductDto): Promise<category>;
     findAllBrand(): Promise<brand[]>;
     findAllcategory(): Promise<category[]>;
-    findAllProduct(): Promise<product[]>;
+    findAllProduct(id:any): Promise<product[]>;
     ProductDetails(id: string): Promise<product>;
     findProductDetails(id: string): Promise<any>;
     findAllProductAdmin(): Promise<product[]>;

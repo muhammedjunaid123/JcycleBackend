@@ -7,6 +7,7 @@ import { ImageController } from 'src/image/image.controller';
 import { rejects } from 'assert';
 import { resolve } from 'path';
 import { Response } from 'express';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable()
 export class ProductService {
@@ -28,8 +29,16 @@ export class ProductService {
   createCategory(createProductDto: CreateProductDto) {
     return this._productRepository.createCategory(createProductDto)
   }
-  findAllProduct() {
-    return this._productRepository.findAllProduct()
+  findAllProduct(id: string) {   
+    let data:any
+    if (id=='null') {      
+       data=null 
+    } else {
+       data = jwtDecode(id)
+      data=data['token']
+    }
+
+    return this._productRepository.findAllProduct(data)
   }
   findAllProductDetail(id: string) {
     return this._productRepository.findProductDetails(id)
@@ -54,14 +63,14 @@ export class ProductService {
     return `This action returns a #${id} product`;
   }
 
-  async productUpdate(id: string, updateProductDto: UpdateProductDto, files: Array<Express.Multer.File>,res:Response) {
-  
-    let image=[]
-      if(files!==undefined){
-         image = await this._image.upload(files);
-      }
-    
-    return this._productRepository.productUpdate(id, updateProductDto, image,res)
+  async productUpdate(id: string, updateProductDto: UpdateProductDto, files: Array<Express.Multer.File>, res: Response) {
+
+    let image = []
+    if (files !== undefined) {
+      image = await this._image.upload(files);
+    }
+
+    return this._productRepository.productUpdate(id, updateProductDto, image, res)
   }
 
   brandUpdate(id: string, updateProductDto: UpdateProductDto) {
@@ -88,9 +97,9 @@ export class ProductService {
 
     return this._productRepository.filter(filter)
   }
-  imgDelete(index:number,id:string){
+  imgDelete(index: number, id: string) {
     console.log('enter 2');
-    
-    return this._productRepository.imgDelete(index,id)
+
+    return this._productRepository.imgDelete(index, id)
   }
 }

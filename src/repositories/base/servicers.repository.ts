@@ -490,6 +490,7 @@ export class servicerRepository implements IServicerRepository {
         try {
 
             return await this._servicerModel.findById({ _id: id });
+
         } catch (error) {
             throw new HttpException(
                 'there is some issue please try again later',
@@ -574,55 +575,55 @@ export class servicerRepository implements IServicerRepository {
     }
     async dashboard(id: string) {
         try {
-            
-     
-        const today = new Date()
-        console.log(today);
 
-        const revenue = await this._serviceOrderModel.aggregate([
-            {
-                $match: {
-                    date: { $lte: today },
-                    status: 'pending'
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    revenue: {
-                        $sum: "$totalAmount"
+
+            const today = new Date()
+            console.log(today);
+
+            const revenue = await this._serviceOrderModel.aggregate([
+                {
+                    $match: {
+                        date: { $lte: today },
+                        status: 'pending'
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        revenue: {
+                            $sum: "$totalAmount"
+                        }
                     }
                 }
-            }
-        ])
-        const service = await this._serviceModel.find({ owner: id }).countDocuments()
-        const done = await this._serviceModel.find({ owner: id, isBooked: true }).countDocuments()
-        const pending = await this._serviceModel.find({ owner: id, isBooked: false }).countDocuments()
-        const locationorder = await this._serviceModel.aggregate([
-            {
-                $match: {
-                    isBooked: true
-                }
-            }, {
-                $group: {
-                    _id: "$location",
-                    count: {
-                        $sum: 1
+            ])
+            const service = await this._serviceModel.find({ owner: id }).countDocuments()
+            const done = await this._serviceModel.find({ owner: id, isBooked: true }).countDocuments()
+            const pending = await this._serviceModel.find({ owner: id, isBooked: false }).countDocuments()
+            const locationorder = await this._serviceModel.aggregate([
+                {
+                    $match: {
+                        isBooked: true
+                    }
+                }, {
+                    $group: {
+                        _id: "$location",
+                        count: {
+                            $sum: 1
+                        }
                     }
                 }
-            }
 
-        ])
+            ])
 
-        console.log(revenue, service, done, pending, locationorder);
+            console.log(revenue, service, done, pending, locationorder);
 
-        return { revenue, service, done, pending, locationorder }
-    } catch (error) {
-        throw new HttpException(
-            'there is some issue please try again later',
-            HttpStatus.BAD_REQUEST
-        )
-    }
+            return { revenue, service, done, pending, locationorder }
+        } catch (error) {
+            throw new HttpException(
+                'there is some issue please try again later',
+                HttpStatus.BAD_REQUEST
+            )
+        }
     }
 
 
