@@ -490,6 +490,7 @@ export class servicerRepository implements IServicerRepository {
         try {
 
             return await this._servicerModel.findById({ _id: id });
+
         } catch (error) {
             throw new HttpException(
                 'there is some issue please try again later',

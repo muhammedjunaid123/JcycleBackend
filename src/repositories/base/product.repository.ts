@@ -6,6 +6,7 @@ import { Model } from "mongoose";
 import { Response } from "express";
 import { promises } from "dns";
 import { IProductRepository } from "../interfaces/product-repostiory.interface";
+const ObjectId = require('mongodb').ObjectId;
 
 export class productRepository implements IProductRepository {
     constructor(
@@ -221,16 +222,87 @@ export class productRepository implements IProductRepository {
     async findAllcategory(): Promise<category[]> {
         return await this._categoryModel.find()
     }
-    async findAllProduct(): Promise<product[]> {
-        const data = await this._productModel.find({ isBlocked: false }).populate('brand')
-        let brandData: any
-        const result = data.filter((res) => {
-            brandData = res['brand']
-            if (brandData['isBlocked'] === false) {
-                return res
-            }
-        })
-        return result
+    async findAllProduct(id: any): Promise<product[]> {
+        if (id === null) {
+            await this._productModel.updateMany({ $set: { wished: false } })
+            const data = await this._productModel.find({ isBlocked: false }).populate('brand')
+            let brandData: any
+            const result = data.filter((res) => {
+                brandData = res['brand']
+                if (brandData['isBlocked'] === false) {
+                    return res
+                }
+            })
+            return result
+        } else {
+
+           
+            const userId = new ObjectId(id);
+            const data = await this._productModel.aggregate([
+                {
+                    $lookup: {
+                        from: "brands",
+                        localField: 'brand',
+                        foreignField: '_id',
+                        as: "brand"
+                    }
+                },
+                {
+                    $addFields: {
+                        brand: { $first: '$brand' }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'wishlists',
+                        localField: '_id',
+                        foreignField: 'product.id',
+                        as: "productData"
+                    }
+                },
+                
+                {
+                    $addFields  : {
+                        wished: {
+                            $cond: {
+                                if: { $gt: [{ $size: "$productData" }, 0] },
+                                then: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: "$productData",
+                                            as: "product",
+                                            in: {
+                                                $cond: {
+                                                    if: { $eq: ["$$product.user", userId] }, // Direct comparison of ObjectIds
+                                                    then: true,
+                                                    else: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                else: false
+                            }
+                        }
+                    }
+                }
+                
+            ]);
+
+
+
+            console.log(data, 'mass');
+
+            let brandData: any
+            const result = data.filter((res) => {
+                brandData = res['brand']
+                if (brandData['isBlocked'] === false) {
+                    return res
+                }
+            })
+
+            return result
+        }
     }
     async ProductDetails(id: string): Promise<product> {
         try {
@@ -424,7 +496,7 @@ export class productRepository implements IProductRepository {
             throw new HttpException(
                 'there is some issue please try again later',
                 HttpStatus.BAD_REQUEST
-               )
+            )
         }
 
     }

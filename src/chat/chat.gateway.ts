@@ -5,7 +5,7 @@ import {
   MessageBody,
   ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server,Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import * as dotenv from 'dotenv';
 import { ChatDto } from './dto/create-chat.dto';
 import { ChatService } from './chat.service';
@@ -18,14 +18,14 @@ dotenv.config();
     allowedHeaders: ['Content-Type', 'X-Auth-Token', 'Origin', 'Authorization'],
 
   },
- 
+
 })
 export class ChatGateway {
   @WebSocketServer()
   server: Server;
-  constructor(private _chatService: ChatService) {}
+  constructor(private _chatService: ChatService) { }
 
- 
+
   @SubscribeMessage('disconnect')
   handleDisconnection(client: Socket, roomName: any) {
     client.leave(roomName.name);

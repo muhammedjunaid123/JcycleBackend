@@ -7,29 +7,31 @@ import { log } from 'console';
 
 @Injectable()
 export class AuthService implements NestMiddleware {
-  constructor(private readonly _jwtService: JwtService) {
-  
-    
-  }
+  constructor(private readonly _jwtService: JwtService) { }
+
   async use(req: Request, res: Response, next: NextFunction) {
+    
     const authHeader = req.headers['authorization'];
-   
+    console.log(authHeader,'auth');
+
     if (!authHeader || !authHeader.startsWith('Bearer')) {
       console.log('u1');
-      
+
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     const token = authHeader.split(' ')[1];
     try {
-      
-      const decoded = this._jwtService.verify(token,{secret:process.env.secret});
-  
-      
-    } catch (error) {  
+
+      const decoded = this._jwtService.verify(token, { secret: process.env.secret });
+
+
+    } catch (error) {
+      console.log(error);
+
       console.log('u2');
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-   
+
     next();
   }
 }
