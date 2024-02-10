@@ -289,10 +289,6 @@ export class productRepository implements IProductRepository {
                 
             ]);
 
-
-
-            console.log(data, 'mass');
-
             let brandData: any
             const result = data.filter((res) => {
                 brandData = res['brand']
