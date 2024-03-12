@@ -140,8 +140,9 @@ export class ServicerService {
         const servicerId = jwtDecode(servicer)
         return this._servicerRepository.addService(data, servicerId['token'])
     }
-    GetService() {
-        return this._servicerRepository.GetService()
+    GetService(id:string) {
+        const servicerId = jwtDecode(id)
+        return this._servicerRepository.GetService(servicerId['token'])
     }
     blockService(id: string, isBlocked: boolean) {
         return this._servicerRepository.blockService(id, isBlocked)

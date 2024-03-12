@@ -77,9 +77,12 @@ export class UsersController {
   
     return this.usersService.addOrder(data)
   }
+  @Get('Adminorder')
+  Adminorder(@Query() id: string) {
+    return this.usersService.Adminorder(id)
+  }
   @Get('order')
   loadOrder(@Query() id: string) {
-    console.log(id);
 
     return this.usersService.loadOrder(id)
   }

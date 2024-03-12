@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { service, serviceOrder, servicer } from "src/servicer/servicers.type";
 import { IServicerRepository } from "../interfaces/servicers-repository.interface";
 import { promises } from "dns";
-
+const ObjectId = require('mongodb').ObjectId;
 export class servicerRepository implements IServicerRepository {
 
     constructor(
@@ -187,10 +187,9 @@ export class servicerRepository implements IServicerRepository {
 
 
     }
-    async GetService(): Promise<service[]> {
+    async GetService(id: string): Promise<service[]> {
         try {
-
-            return await this._serviceModel.find().populate('owner')
+            return await this._serviceModel.find({ owner: id }).populate('owner')
         } catch (error) {
             throw new HttpException(
                 'there is some issue please try again later',
@@ -383,7 +382,7 @@ export class servicerRepository implements IServicerRepository {
     async getUserserviceHistory(id: string): Promise<serviceOrder[]> {
         try {
 
-            let a = await this._serviceOrderModel.find({ user: id }).populate('owner').populate('service').populate('user')
+            let a = await this._serviceOrderModel.find({ owner: id }).populate('owner').populate('service').populate('user')
             console.log(a)
             return a
         } catch (error) {
@@ -598,6 +597,11 @@ export class servicerRepository implements IServicerRepository {
             const revenue = await this._serviceOrderModel.aggregate([
                 {
                     $match: {
+                        owner: id
+                    }
+                },
+                {
+                    $match: {
                         date: { $lte: today },
                         status: 'pending'
                     }
@@ -614,9 +618,12 @@ export class servicerRepository implements IServicerRepository {
             const service = await this._serviceModel.find({ owner: id }).countDocuments()
             const done = await this._serviceModel.find({ owner: id, isBooked: true }).countDocuments()
             const pending = await this._serviceModel.find({ owner: id, isBooked: false }).countDocuments()
+            const userId = new ObjectId(id);
             const locationorder = await this._serviceModel.aggregate([
+
                 {
                     $match: {
+                        owner: userId,
                         isBooked: true
                     }
                 }, {

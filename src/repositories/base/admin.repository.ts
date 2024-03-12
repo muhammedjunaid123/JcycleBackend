@@ -78,7 +78,7 @@ export class AdminRepository implements IAdminRepository {
         },
         {
           $match: {
-            "product.status": 'delivered'
+            "product.status":'delivered'
           }
         },
         {

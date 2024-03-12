@@ -39,7 +39,7 @@ import { chatProviders } from 'src/chat/chatProviders';
     ...cartProviders, ...wishlistProviders, ...productProviders, ...brandProviders, ...categoryProviders,
     orderRepository, ...orderProviders, ...reviewProviders, reviewRepository, ...rentProviders, rentRepository, ImageService,
     ...addressProviders, addressRepository, ...rentOrderProviders, ...locationProviders, locationRepository,...ServicerProviders,
-    servicerRepository,...ServiceProviders,...serviceOrderProviders,...RENTreviewProviders,...chatProviders
+    servicerRepository,...ServiceProviders,...serviceOrderProviders,...RENTreviewProviders,...chatProviders,
   ],
   exports: [UsersService, JwtModule],
 

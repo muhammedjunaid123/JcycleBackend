@@ -6,7 +6,7 @@ export interface IServicerRepository{
     ServicerFindId(id: string):Promise<servicer>;
     verified(id: string):Promise<servicer>;
     addService(data: any, servicerId: string):Promise<service>;
-    GetService():Promise<service[]>;
+    GetService(id:string):Promise<service[]>;
     GetAllServiceUser():Promise<service[]> ;
     blockService(id: string, isBlocked: boolean):Promise<service>;
     getServiceById(id: string):Promise<service>;

@@ -39,7 +39,10 @@ export class UsersService {
   //service for user registration
   async SignUp(createUserDto: CreateUserDto, res: Response) {
 
-    return await this._UserRepository.createUser(createUserDto)
+    let UserData= await this._UserRepository.createUser(createUserDto)
+    return res.status(HttpStatus.CREATED).json({
+      UserData:UserData
+    });
 
 
   }
@@ -209,6 +212,10 @@ export class UsersService {
     return this._orderRepository.addOrder(decoded['token'],razorId,paymentMethod,location)
   }
   loadOrder(id: string) {
+    const decoded = jwtDecode(id['id']);
+    return this._orderRepository.loadOrderUser(decoded['token'])
+  }
+  Adminorder(id: string) {
     const decoded = jwtDecode(id['id']);
     return this._orderRepository.loadOrder(decoded['token'])
   }

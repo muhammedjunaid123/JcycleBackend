@@ -28,8 +28,8 @@ export class ServicerController {
    return this._servicerService.addService(data,servicer)
   }   
   @Get('Service')
-  GetService(){
-    return this._servicerService.GetService()
+  GetService(@Query('id') id:string){
+    return this._servicerService.GetService(id)
   }
   @Patch('blockService')
   blockService(@Body('id') id:string,@Body('isBlocked') isBlocked:boolean ){

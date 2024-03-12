@@ -60,7 +60,11 @@ export class UserRepository implements IUserRepository {
     try {
 
 
-      return await this._userModel.findOne({ email: user.email })
+      let data =await this._userModel.findOne({ email: user.email,isVerified:true })
+      if(!data){
+        await this._userModel.findOneAndDelete({ email: user.email})
+      }
+      return data
 
     } catch (error) {
       throw new HttpException(
