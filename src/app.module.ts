@@ -12,6 +12,8 @@ import { AuthService } from './auth/auth.service';
 import { excluded } from './auth/exclude.auth';
 import { ServicerModule } from './servicer/servicer.module';
 import { ChatModule } from './chat/chat.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronService } from './cron.service';
 
 
 
@@ -24,6 +26,7 @@ import { ChatModule } from './chat/chat.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
@@ -47,7 +50,7 @@ import { ChatModule } from './chat/chat.module';
       ChatModule,
   ]
 ,  controllers: [AppController],
-  providers: [AppService, ],
+  providers: [AppService,CronService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -51,8 +51,6 @@ export class orderRepository implements IOrderRepository {
     }
     async loadOrderUser(user: string): Promise<order[]> {
         try {
-
-
             return await this._orderModel.find({user:user}).populate('product.id').populate('user');
         } catch (error) {
             throw new HttpException(
