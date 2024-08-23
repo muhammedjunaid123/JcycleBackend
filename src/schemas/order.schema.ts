@@ -18,6 +18,7 @@ export const orderSchema = new mongoose.Schema(
             },
             DeliveryDate: {
                 type: Date,
+                required: false,
                 default: new Date(new Date().setDate(new Date().getDate() + 10))
 
             },
