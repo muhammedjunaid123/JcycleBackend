@@ -17,10 +17,11 @@ export class orderRepository implements IOrderRepository {
     async addOrder(user: string, razorId: any, paymentMethod: any, location: string): Promise<order> {
         try {
             const DeliveryDate = new Date();
-            console.log(DeliveryDate, 'date');
             DeliveryDate.setDate(DeliveryDate.getDate() + 10);
-            console.log(DeliveryDate, 'date1');
-            const cartdata = await this._cartModel.findOneAndUpdate({ user: user }, { $set: { DeliveryDate: DeliveryDate } })
+
+            const cartdata = await this._cartModel.findOneAndUpdate({ user: user },
+                { $set: { 'product.$[].DeliveryDate': DeliveryDate } },
+                { new: true, multi: true })
             if (paymentMethod === 'wallet') {
                 await this._userModel.findByIdAndUpdate({ _id: user }, {
                     $inc: { wallet: -cartdata['TotalAmount'] }, $push: {
