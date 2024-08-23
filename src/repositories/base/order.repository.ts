@@ -16,7 +16,11 @@ export class orderRepository implements IOrderRepository {
     ) { }
     async addOrder(user: string, razorId: any, paymentMethod: any, location: string): Promise<order> {
         try {
-            const cartdata = await this._cartModel.findOne({ user: user })
+            const DeliveryDate = new Date();
+            console.log(DeliveryDate, 'date');
+            DeliveryDate.setDate(DeliveryDate.getDate() + 10);
+            console.log(DeliveryDate, 'date1');
+            const cartdata = await this._cartModel.findOneAndUpdate({ user: user }, { $set: { DeliveryDate: DeliveryDate } })
             if (paymentMethod === 'wallet') {
                 await this._userModel.findByIdAndUpdate({ _id: user }, {
                     $inc: { wallet: -cartdata['TotalAmount'] }, $push: {
@@ -29,21 +33,14 @@ export class orderRepository implements IOrderRepository {
                 })
             }
             const product: any = await cartdata['product']
-            const DeliveryDate = new Date();
-            console.log(DeliveryDate, 'date');
-            DeliveryDate.setDate(DeliveryDate.getDate() + 10);
-            console.log(DeliveryDate, 'date1');
-            const updatedProducts = product.map(p => ({
-                ...p,
-                DeliveryDate: DeliveryDate,
-            }));
-         console.log(updatedProducts);
-         
+
+
+
             const data = new this._orderModel({
                 user: user,
                 Location: location,
-                product: updatedProducts,
-               
+                product: product,
+
             })
 
             await this._cartModel.findOneAndDelete({ user: user })
