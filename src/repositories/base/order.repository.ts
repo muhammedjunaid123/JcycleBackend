@@ -33,13 +33,16 @@ export class orderRepository implements IOrderRepository {
             console.log(DeliveryDate, 'date');
             DeliveryDate.setDate(DeliveryDate.getDate() + 10);
             console.log(DeliveryDate, 'date1');
-
+            const updatedProducts = product.map(p => ({
+                ...p,
+                DeliveryDate: DeliveryDate,
+            }));
 
             const data = new this._orderModel({
                 user: user,
                 Location: location,
-                product: product,
-                DeliveryDate: DeliveryDate
+                product: updatedProducts,
+               
             })
 
             await this._cartModel.findOneAndDelete({ user: user })
