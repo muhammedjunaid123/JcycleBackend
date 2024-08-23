@@ -17,8 +17,6 @@ export class orderRepository implements IOrderRepository {
     async addOrder(user: string, razorId: any, paymentMethod: any, location: string): Promise<order> {
         try {
             const cartdata = await this._cartModel.findOne({ user: user })
-            console.log(cartdata);
-
             if (paymentMethod === 'wallet') {
                 await this._userModel.findByIdAndUpdate({ _id: user }, {
                     $inc: { wallet: -cartdata['TotalAmount'] }, $push: {
@@ -32,9 +30,9 @@ export class orderRepository implements IOrderRepository {
             }
             const product: any = await cartdata['product']
             const DeliveryDate = new Date();
-            console.log(DeliveryDate);
+            console.log(DeliveryDate, 'date');
             DeliveryDate.setUTCDate(DeliveryDate.getUTCDate() + 10);
-            console.log(DeliveryDate);
+            console.log(DeliveryDate, 'date1');
 
 
             const data = new this._orderModel({
