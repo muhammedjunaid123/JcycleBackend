@@ -76,10 +76,7 @@ export class rentRepository implements IRentRepository {
                 bookings: {
                   $not: {
                     $elemMatch: {
-                      $or: [
-                        { start: { $lte: end }, end: { $gte: start } }, // Existing booking overlaps
-                        { start: { $gte: end }, end: { $lte: start } }  // Existing booking is within the specified range
-                      ]
+                      start: { $lte: end }, end: { $gte: start }
                     }
                   }
                 }
