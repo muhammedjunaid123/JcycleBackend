@@ -18,7 +18,7 @@ export class orderRepository implements IOrderRepository {
         try {
             const cartdata = await this._cartModel.findOne({ user: user })
             console.log(cartdata);
-            
+
             if (paymentMethod === 'wallet') {
                 await this._userModel.findByIdAndUpdate({ _id: user }, {
                     $inc: { wallet: -cartdata['TotalAmount'] }, $push: {
@@ -31,13 +31,15 @@ export class orderRepository implements IOrderRepository {
                 })
             }
             const product: any = await cartdata['product']
+            const DeliveryDate = new Date()
+            DeliveryDate.setDate(DeliveryDate.getDate() + 10)
             const data = new this._orderModel({
                 user: user,
                 Location: location,
                 product: product,
-
+                DeliveryDate: DeliveryDate
             })
-           
+
             await this._cartModel.findOneAndDelete({ user: user })
             return await data.save()
         } catch (error) {
@@ -51,7 +53,7 @@ export class orderRepository implements IOrderRepository {
     }
     async loadOrderUser(user: string): Promise<order[]> {
         try {
-            return await this._orderModel.find({user:user}).populate('product.id').populate('user');
+            return await this._orderModel.find({ user: user }).populate('product.id').populate('user');
         } catch (error) {
             throw new HttpException(
                 'there is some issue please try again later',
@@ -62,7 +64,7 @@ export class orderRepository implements IOrderRepository {
     async loadOrder(user: string): Promise<order[]> {
         try {
 
-console.log('hitter');
+            console.log('hitter');
 
             return await this._orderModel.find().populate('product.id').populate('user');
         } catch (error) {

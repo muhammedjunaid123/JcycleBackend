@@ -1,11 +1,10 @@
 import * as mongoose from 'mongoose';
-const DeliveryDate = new Date()
-DeliveryDate.setDate(DeliveryDate.getDate() + 10)
+
 
 export const orderSchema = new mongoose.Schema(
     {
         user: { type: mongoose.Schema.ObjectId, ref: 'User' },
-        Location: { type: String, required:true },
+        Location: { type: String, required: true },
         product: [{
             id: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +18,7 @@ export const orderSchema = new mongoose.Schema(
             },
             DeliveryDate: {
                 type: Date,
-                default: DeliveryDate
+                required: true
             },
 
 
