@@ -31,8 +31,9 @@ export class orderRepository implements IOrderRepository {
                 })
             }
             const product: any = await cartdata['product']
-            const DeliveryDate = new Date()
-            DeliveryDate.setDate(DeliveryDate.getDate() + 10)
+            const DeliveryDate = new Date();
+            DeliveryDate.setUTCDate(DeliveryDate.getUTCDate() + 10);
+            
             const data = new this._orderModel({
                 user: user,
                 Location: location,
