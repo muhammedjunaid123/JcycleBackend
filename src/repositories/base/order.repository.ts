@@ -30,9 +30,6 @@ export class orderRepository implements IOrderRepository {
                 })
             }
             const product: any = await cartdata['product']
-
-
-
             const data = new this._orderModel({
                 user: user,
                 Location: location,
