@@ -37,7 +37,8 @@ export class orderRepository implements IOrderRepository {
                 ...p,
                 DeliveryDate: DeliveryDate,
             }));
-
+         console.log(updatedProducts);
+         
             const data = new this._orderModel({
                 user: user,
                 Location: location,
